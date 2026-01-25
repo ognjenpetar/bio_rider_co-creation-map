@@ -1,0 +1,28 @@
+import { type ReactNode } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
+import { LoadingSpinner } from '../common/LoadingSpinner';
+
+interface AuthGuardProps {
+  children: ReactNode;
+}
+
+export function AuthGuard({ children }: AuthGuardProps) {
+  const { isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    // Redirect to login, preserving the attempted URL
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return <>{children}</>;
+}

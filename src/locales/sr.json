@@ -1,0 +1,124 @@
+{
+  "app": {
+    "title": "Bio Rider Mapa Ko-kreiranja",
+    "subtitle": "Mapa Ko-kreiranja",
+    "region": "Region Uzice - Sevojno, Srbija"
+  },
+  "nav": {
+    "map": "Mapa",
+    "admin": "Admin Panel"
+  },
+  "auth": {
+    "welcome": "Dobrodosli",
+    "loginPrompt": "Prijavite se da biste mogli da dodajete ili menjate lokacije na mapi ko-kreiranja",
+    "signInWithGoogle": "Nastavi sa Google nalogom",
+    "signInShort": "Prijavi se",
+    "signingIn": "Prijavljivanje...",
+    "signOut": "Odjavi se",
+    "loginError": "Prijava nije uspela. Pokusajte ponovo.",
+    "termsNotice": "Prijavom pristajete da ucestvujete u procesu ko-kreiranja za projekat Bio Rider.",
+    "viewerNotice": "Gledate kao gost. Prijavite se sa Google nalogom da biste mogli da dodajete ili menjate lokacije."
+  },
+  "roles": {
+    "superadmin": "Super Admin",
+    "admin": "Admin",
+    "editor": "Urednik",
+    "viewer": "Gledatelj"
+  },
+  "map": {
+    "title": "Mapa Ko-kreiranja",
+    "loading": "Ucitavanje mape...",
+    "noLocations": "Nema pronadjenih lokacija",
+    "addLocation": "Dodaj Lokaciju",
+    "clickToAdd": "Kliknite na mapu da dodate lokaciju"
+  },
+  "location": {
+    "name": "Naziv",
+    "description": "Opis",
+    "coordinates": "Koordinate",
+    "latitude": "Geografska sirina",
+    "longitude": "Geografska duzina",
+    "images": "Slike",
+    "documents": "Dokumenti",
+    "createdBy": "Kreirao",
+    "createdAt": "Kreirano",
+    "updatedAt": "Poslednja izmena",
+    "noDescription": "Nema dostupnog opisa",
+    "viewDetails": "Pogledaj Detalje",
+    "edit": "Izmeni",
+    "delete": "Obrisi",
+    "confirmDelete": "Da li ste sigurni da zelite da obrisete ovu lokaciju?"
+  },
+  "locationForm": {
+    "createTitle": "Dodaj Novu Lokaciju",
+    "editTitle": "Izmeni Lokaciju",
+    "suggestTitle": "Predlozi Izmene",
+    "namePlaceholder": "Unesite naziv lokacije",
+    "descriptionPlaceholder": "Unesite opis (Markdown podrzan)",
+    "uploadImages": "Dodaj Slike",
+    "uploadDocuments": "Dodaj Dokumente",
+    "dropImages": "Prevucite slike ovde ili kliknite za izbor",
+    "dropDocuments": "Prevucite PDF ili Word dokumente ovde",
+    "supportedImageFormats": "Podrzano: JPG, PNG, GIF, WebP (maks 5MB)",
+    "supportedDocFormats": "Podrzano: PDF, DOC, DOCX (maks 20MB)",
+    "selectOnMap": "Kliknite na mapu za izbor koordinata",
+    "save": "Sacuvaj",
+    "cancel": "Otkazi",
+    "submit": "Posalji Predlog",
+    "saving": "Cuvanje...",
+    "success": "Lokacija uspesno sacuvana",
+    "error": "Cuvanje lokacije nije uspelo"
+  },
+  "search": {
+    "placeholder": "Pretrazi lokacije...",
+    "noResults": "Nema rezultata",
+    "resultsCount": "{{count}} rezultat pronadjen",
+    "resultsCount_plural": "{{count}} rezultata pronadjeno",
+    "matchedIn": "Pronadjeno u",
+    "location": "lokaciji",
+    "document": "dokumentu",
+    "both": "lokaciji i dokumentima",
+    "clear": "Obrisi pretragu"
+  },
+  "suggestions": {
+    "title": "Predlozi Izmena",
+    "pending": "Na cekanju",
+    "approved": "Odobreno",
+    "rejected": "Odbijeno",
+    "approve": "Odobri",
+    "reject": "Odbij",
+    "reviewNotes": "Napomene",
+    "reviewNotesPlaceholder": "Dodajte napomene za ovu recenziju...",
+    "noSuggestions": "Nema predloga na cekanju",
+    "submittedBy": "Poslao",
+    "submittedAt": "Poslato",
+    "suggestedChanges": "Predlozene Izmene"
+  },
+  "admin": {
+    "title": "Admin Panel",
+    "users": "Korisnici",
+    "suggestions": "Predlozi",
+    "locations": "Lokacije",
+    "files": "Fajlovi",
+    "userManagement": "Upravljanje Korisnicima",
+    "changeRole": "Promeni Ulogu",
+    "noUsers": "Nema pronadjenih korisnika",
+    "totalUsers": "Ukupno Korisnika",
+    "pendingSuggestions": "Predlozi na Cekanju",
+    "totalLocations": "Ukupno Lokacija"
+  },
+  "common": {
+    "loading": "Ucitavanje...",
+    "error": "Doslo je do greske",
+    "retry": "Pokusaj Ponovo",
+    "save": "Sacuvaj",
+    "cancel": "Otkazi",
+    "delete": "Obrisi",
+    "edit": "Izmeni",
+    "view": "Pogledaj",
+    "close": "Zatvori",
+    "confirm": "Potvrdi",
+    "yes": "Da",
+    "no": "Ne"
+  }
+}
