@@ -8,7 +8,7 @@ import type { Location } from '../../types';
 
 export function LocationModeration() {
   const { t } = useTranslation();
-  const { isSuperAdmin } = useAuth();
+  const { isAdmin } = useAuth();
   const [locations, setLocations] = useState<Location[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +32,7 @@ export function LocationModeration() {
   }, [t]);
 
   const handleDelete = async () => {
-    if (!deleteTarget || !isSuperAdmin) return;
+    if (!deleteTarget || !isAdmin) return;
 
     try {
       setIsDeleting(true);
@@ -73,7 +73,7 @@ export function LocationModeration() {
 
       {locations.length === 0 ? (
         <p className="text-center py-8 text-gray-500">
-          {t('map.noLocations')}
+          {t('admin.noLocations')}
         </p>
       ) : (
         <div className="overflow-x-auto">
@@ -84,13 +84,16 @@ export function LocationModeration() {
                   {t('location.name')}
                 </th>
                 <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">
+                  {t('location.createdBy')}
+                </th>
+                <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">
                   {t('location.coordinates')}
                 </th>
                 <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">
                   {t('location.createdAt')}
                 </th>
                 <th className="text-right py-3 px-4 text-sm font-medium text-gray-500">
-                  Actions
+                  {t('common.delete')}
                 </th>
               </tr>
             </thead>
@@ -106,9 +109,9 @@ export function LocationModeration() {
                           className="w-10 h-10 rounded object-cover"
                         />
                       ) : (
-                        <div className="w-10 h-10 bg-primary-100 rounded flex items-center justify-center">
+                        <div className="w-10 h-10 bg-green-100 rounded flex items-center justify-center">
                           <svg
-                            className="w-5 h-5 text-primary-600"
+                            className="w-5 h-5 text-green-600"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -128,20 +131,23 @@ export function LocationModeration() {
                     </div>
                   </td>
                   <td className="py-3 px-4 text-sm text-gray-600">
+                    <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-medium">
+                      {location.created_by || 'Unknown'}
+                    </span>
+                  </td>
+                  <td className="py-3 px-4 text-sm text-gray-600 font-mono">
                     {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}
                   </td>
                   <td className="py-3 px-4 text-sm text-gray-600">
                     {new Date(location.created_at).toLocaleDateString()}
                   </td>
                   <td className="py-3 px-4 text-right">
-                    {isSuperAdmin && (
-                      <button
-                        onClick={() => setDeleteTarget(location)}
-                        className="text-sm text-red-600 hover:text-red-700"
-                      >
-                        {t('common.delete')}
-                      </button>
-                    )}
+                    <button
+                      onClick={() => setDeleteTarget(location)}
+                      className="text-sm text-red-600 hover:text-red-700 font-medium"
+                    >
+                      {t('common.delete')}
+                    </button>
                   </td>
                 </tr>
               ))}

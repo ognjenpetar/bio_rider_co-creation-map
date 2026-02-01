@@ -2,7 +2,8 @@
   "app": {
     "title": "Bio Rider Co-Creation Map",
     "subtitle": "Co-Creation Map",
-    "region": "Uzice - Sevojno Region, Serbia"
+    "region": "Uzice - Sevojno Region, Serbia",
+    "footer": "Bio Rider - Uzice-Sevojno Region"
   },
   "nav": {
     "map": "Map",
@@ -10,20 +11,21 @@
   },
   "auth": {
     "welcome": "Welcome",
-    "loginPrompt": "Sign in to edit locations on the co-creation map",
-    "signInWithGoogle": "Continue with Google",
-    "signInShort": "Sign In",
-    "signingIn": "Signing in...",
+    "enterUsername": "Enter your name to continue",
+    "username": "Username",
+    "usernamePlaceholder": "Enter your name",
+    "password": "Password",
+    "passwordPlaceholder": "Enter admin password",
+    "adminPasswordRequired": "Admin account requires a password",
+    "login": "Sign In",
     "signOut": "Sign Out",
     "loginError": "Failed to sign in. Please try again.",
-    "termsNotice": "By signing in, you agree to participate in the co-creation process for the Bio Rider project.",
-    "viewerNotice": "You are viewing as a guest. Sign in with Google to add or edit locations."
+    "infoText": "Enter your name to add locations to the map. For admin access, use username 'admin'.",
+    "loggedInAs": "Logged in as"
   },
   "roles": {
-    "superadmin": "Super Admin",
     "admin": "Admin",
-    "editor": "Editor",
-    "viewer": "Viewer"
+    "user": "User"
   },
   "map": {
     "title": "Co-Creation Map",
@@ -47,12 +49,13 @@
     "viewDetails": "View Details",
     "edit": "Edit",
     "delete": "Delete",
-    "confirmDelete": "Are you sure you want to delete this location?"
+    "confirmDelete": "Are you sure you want to delete this location?",
+    "adminOnlyDelete": "Only admin can delete locations",
+    "adminOnlyEdit": "Only admin or creator can edit this location"
   },
   "locationForm": {
     "createTitle": "Add New Location",
     "editTitle": "Edit Location",
-    "suggestTitle": "Suggest Changes",
     "namePlaceholder": "Enter location name",
     "descriptionPlaceholder": "Enter description (Markdown supported)",
     "uploadImages": "Upload Images",
@@ -64,7 +67,6 @@
     "selectOnMap": "Click on map to select coordinates",
     "save": "Save",
     "cancel": "Cancel",
-    "submit": "Submit Suggestion",
     "saving": "Saving...",
     "success": "Location saved successfully",
     "error": "Failed to save location"
@@ -80,32 +82,12 @@
     "both": "location and documents",
     "clear": "Clear search"
   },
-  "suggestions": {
-    "title": "Edit Suggestions",
-    "pending": "Pending",
-    "approved": "Approved",
-    "rejected": "Rejected",
-    "approve": "Approve",
-    "reject": "Reject",
-    "reviewNotes": "Review Notes",
-    "reviewNotesPlaceholder": "Add notes for this review...",
-    "noSuggestions": "No pending suggestions",
-    "submittedBy": "Submitted by",
-    "submittedAt": "Submitted at",
-    "suggestedChanges": "Suggested Changes"
-  },
   "admin": {
     "title": "Admin Panel",
-    "users": "Users",
-    "suggestions": "Suggestions",
     "locations": "Locations",
-    "files": "Files",
-    "userManagement": "User Management",
-    "changeRole": "Change Role",
-    "noUsers": "No users found",
-    "totalUsers": "Total Users",
-    "pendingSuggestions": "Pending Suggestions",
-    "totalLocations": "Total Locations"
+    "totalLocations": "Total Locations",
+    "deleteLocation": "Delete Location",
+    "noLocations": "No locations found"
   },
   "common": {
     "loading": "Loading...",

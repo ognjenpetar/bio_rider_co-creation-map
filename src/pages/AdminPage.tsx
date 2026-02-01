@@ -1,34 +1,24 @@
-import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Header } from '../components/common/Header';
-import {
-  AdminLayout,
-  UserManagement,
-  EditSuggestions,
-  LocationModeration,
-} from '../components/admin';
+import { LocationModeration } from '../components/admin';
 
 export function AdminPage() {
-  const [activeTab, setActiveTab] = useState('users');
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'users':
-        return <UserManagement />;
-      case 'suggestions':
-        return <EditSuggestions />;
-      case 'locations':
-        return <LocationModeration />;
-      default:
-        return <UserManagement />;
-    }
-  };
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      <AdminLayout activeTab={activeTab} onTabChange={setActiveTab}>
-        {renderContent()}
-      </AdminLayout>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">{t('admin.title')}</h1>
+          <p className="text-gray-500 mt-1">
+            {t('admin.locations')}
+          </p>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <LocationModeration />
+        </div>
+      </main>
     </div>
   );
 }

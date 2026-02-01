@@ -1,21 +1,4 @@
-// User roles enum matching database
-export type UserRole = 'superadmin' | 'admin' | 'editor' | 'viewer';
-
-// Suggestion status enum
-export type SuggestionStatus = 'pending' | 'approved' | 'rejected';
-
-// User profile type
-export interface Profile {
-  id: string;
-  email: string;
-  full_name: string | null;
-  avatar_url: string | null;
-  role: UserRole;
-  created_at: string;
-  updated_at: string;
-}
-
-// Location type
+// Location type - stored in Supabase
 export interface Location {
   id: string;
   name: string;
@@ -23,7 +6,7 @@ export interface Location {
   latitude: number;
   longitude: number;
   preview_image_url: string | null;
-  created_by: string | null;
+  created_by: string | null; // Username of the person who created this location
   created_at: string;
   updated_at: string;
   is_active: boolean;
@@ -61,27 +44,6 @@ export interface LocationDocument {
   extraction_status: 'pending' | 'completed' | 'failed';
   created_by: string | null;
   created_at: string;
-}
-
-// Edit suggestion type
-export interface EditSuggestion {
-  id: string;
-  location_id: string | null;
-  suggested_by: string;
-  suggestion_type: 'create' | 'update' | 'delete';
-  suggested_data: LocationFormData;
-  status: SuggestionStatus;
-  reviewed_by: string | null;
-  review_notes: string | null;
-  created_at: string;
-  reviewed_at: string | null;
-}
-
-// Edit suggestion with related data
-export interface EditSuggestionWithProfile extends EditSuggestion {
-  suggestor: Profile | null;
-  reviewer: Profile | null;
-  location: Location | null;
 }
 
 // Form data for creating/editing locations

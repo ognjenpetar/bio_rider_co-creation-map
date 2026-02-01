@@ -60,6 +60,7 @@ export async function createLocation(
     description?: string;
     latitude: number;
     longitude: number;
+    created_by: string; // Username of the creator
   },
   images?: File[],
   documents?: File[]
@@ -72,6 +73,7 @@ export async function createLocation(
       description: data.description,
       latitude: data.latitude,
       longitude: data.longitude,
+      created_by: data.created_by,
     })
     .select()
     .single();

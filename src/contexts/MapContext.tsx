@@ -19,6 +19,7 @@ interface MapContextType {
   setLocations: (locations: Location[]) => void;
   selectedLocation: Location | null;
   selectLocation: (location: Location | null) => void;
+  setSelectedLocation: (location: Location | null) => void;
   filteredLocationIds: Set<string> | null;
   setFilteredLocationIds: (ids: Set<string> | null) => void;
   isSearchActive: boolean;
@@ -73,6 +74,7 @@ export function MapProvider({ children }: MapProviderProps) {
     setLocations,
     selectedLocation,
     selectLocation,
+    setSelectedLocation,
     filteredLocationIds,
     setFilteredLocationIds,
     isSearchActive,

@@ -9,7 +9,6 @@ import type { LeafletMouseEvent } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 import { useMap, DEFAULT_CENTER, DEFAULT_ZOOM } from '../../contexts/MapContext';
-import { useAuth } from '../../contexts/AuthContext';
 import { LocationMarkers } from './LocationMarkers';
 
 // Fix for default marker icons in React-Leaflet
@@ -41,7 +40,6 @@ function MapSync() {
 
 // Component to handle map click events for adding locations
 function MapClickHandler() {
-  const { canEdit } = useAuth();
   const {
     isAddingLocation,
     setPendingCoordinates,
@@ -50,7 +48,8 @@ function MapClickHandler() {
 
   const handleClick = useCallback(
     (e: LeafletMouseEvent) => {
-      if (canEdit && isAddingLocation) {
+      // Everyone can add locations
+      if (isAddingLocation) {
         setPendingCoordinates({
           lat: e.latlng.lat,
           lng: e.latlng.lng,
@@ -58,7 +57,7 @@ function MapClickHandler() {
         setIsAddingLocation(false);
       }
     },
-    [canEdit, isAddingLocation, setPendingCoordinates, setIsAddingLocation]
+    [isAddingLocation, setPendingCoordinates, setIsAddingLocation]
   );
 
   useMapEvents({

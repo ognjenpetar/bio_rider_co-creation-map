@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { MapProvider } from './contexts/MapContext';
-import { AuthGuard, RoleGuard } from './components/auth';
 import { LoginPage, MapPage, AdminPage } from './pages';
+import { LoadingSpinner } from './components/common';
 
 // Handle GitHub Pages SPA redirect
 function GitHubPagesRedirect() {
@@ -21,33 +21,73 @@ function GitHubPagesRedirect() {
   return null;
 }
 
+// Require authentication to access routes
+function RequireAuth({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+}
+
+// Admin guard - only allow admin users
+function RequireAdmin({ children }: { children: React.ReactNode }) {
+  const { isAdmin, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+}
+
 function AppRoutes() {
   return (
     <>
       <GitHubPagesRedirect />
       <Routes>
-        {/* Public route - Login (optional, for users who want to edit) */}
+        {/* Login page */}
         <Route path="/login" element={<LoginPage />} />
 
-        {/* Public route - Map (anonymous viewing allowed) */}
+        {/* Map page - requires login */}
         <Route
           path="/"
           element={
-            <MapProvider>
-              <MapPage />
-            </MapProvider>
+            <RequireAuth>
+              <MapProvider>
+                <MapPage />
+              </MapProvider>
+            </RequireAuth>
           }
         />
 
-        {/* Admin route - requires admin or superadmin role */}
+        {/* Admin page - requires admin */}
         <Route
           path="/admin"
           element={
-            <AuthGuard>
-              <RoleGuard allowedRoles={['admin', 'superadmin']}>
+            <RequireAuth>
+              <RequireAdmin>
                 <AdminPage />
-              </RoleGuard>
-            </AuthGuard>
+              </RequireAdmin>
+            </RequireAuth>
           }
         />
 

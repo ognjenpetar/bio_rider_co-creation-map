@@ -2,7 +2,8 @@
   "app": {
     "title": "Bio Rider Mapa Ko-kreiranja",
     "subtitle": "Mapa Ko-kreiranja",
-    "region": "Region Uzice - Sevojno, Srbija"
+    "region": "Region Uzice - Sevojno, Srbija",
+    "footer": "Bio Rider - Region Uzice-Sevojno"
   },
   "nav": {
     "map": "Mapa",
@@ -10,20 +11,21 @@
   },
   "auth": {
     "welcome": "Dobrodosli",
-    "loginPrompt": "Prijavite se da biste mogli da dodajete ili menjate lokacije na mapi ko-kreiranja",
-    "signInWithGoogle": "Nastavi sa Google nalogom",
-    "signInShort": "Prijavi se",
-    "signingIn": "Prijavljivanje...",
+    "enterUsername": "Unesite svoje ime da nastavite",
+    "username": "Korisnicko ime",
+    "usernamePlaceholder": "Unesite vase ime",
+    "password": "Lozinka",
+    "passwordPlaceholder": "Unesite admin lozinku",
+    "adminPasswordRequired": "Admin nalog zahteva lozinku",
+    "login": "Prijavi se",
     "signOut": "Odjavi se",
     "loginError": "Prijava nije uspela. Pokusajte ponovo.",
-    "termsNotice": "Prijavom pristajete da ucestvujete u procesu ko-kreiranja za projekat Bio Rider.",
-    "viewerNotice": "Gledate kao gost. Prijavite se sa Google nalogom da biste mogli da dodajete ili menjate lokacije."
+    "infoText": "Unesite vase ime da biste mogli da dodajete lokacije na mapu. Za admin pristup, koristite korisnicko ime 'admin'.",
+    "loggedInAs": "Prijavljeni kao"
   },
   "roles": {
-    "superadmin": "Super Admin",
     "admin": "Admin",
-    "editor": "Urednik",
-    "viewer": "Gledatelj"
+    "user": "Korisnik"
   },
   "map": {
     "title": "Mapa Ko-kreiranja",
@@ -47,12 +49,13 @@
     "viewDetails": "Pogledaj Detalje",
     "edit": "Izmeni",
     "delete": "Obrisi",
-    "confirmDelete": "Da li ste sigurni da zelite da obrisete ovu lokaciju?"
+    "confirmDelete": "Da li ste sigurni da zelite da obrisete ovu lokaciju?",
+    "adminOnlyDelete": "Samo admin moze da brise lokacije",
+    "adminOnlyEdit": "Samo admin ili kreator moze da menja lokaciju"
   },
   "locationForm": {
     "createTitle": "Dodaj Novu Lokaciju",
     "editTitle": "Izmeni Lokaciju",
-    "suggestTitle": "Predlozi Izmene",
     "namePlaceholder": "Unesite naziv lokacije",
     "descriptionPlaceholder": "Unesite opis (Markdown podrzan)",
     "uploadImages": "Dodaj Slike",
@@ -64,7 +67,6 @@
     "selectOnMap": "Kliknite na mapu za izbor koordinata",
     "save": "Sacuvaj",
     "cancel": "Otkazi",
-    "submit": "Posalji Predlog",
     "saving": "Cuvanje...",
     "success": "Lokacija uspesno sacuvana",
     "error": "Cuvanje lokacije nije uspelo"
@@ -80,32 +82,12 @@
     "both": "lokaciji i dokumentima",
     "clear": "Obrisi pretragu"
   },
-  "suggestions": {
-    "title": "Predlozi Izmena",
-    "pending": "Na cekanju",
-    "approved": "Odobreno",
-    "rejected": "Odbijeno",
-    "approve": "Odobri",
-    "reject": "Odbij",
-    "reviewNotes": "Napomene",
-    "reviewNotesPlaceholder": "Dodajte napomene za ovu recenziju...",
-    "noSuggestions": "Nema predloga na cekanju",
-    "submittedBy": "Poslao",
-    "submittedAt": "Poslato",
-    "suggestedChanges": "Predlozene Izmene"
-  },
   "admin": {
     "title": "Admin Panel",
-    "users": "Korisnici",
-    "suggestions": "Predlozi",
     "locations": "Lokacije",
-    "files": "Fajlovi",
-    "userManagement": "Upravljanje Korisnicima",
-    "changeRole": "Promeni Ulogu",
-    "noUsers": "Nema pronadjenih korisnika",
-    "totalUsers": "Ukupno Korisnika",
-    "pendingSuggestions": "Predlozi na Cekanju",
-    "totalLocations": "Ukupno Lokacija"
+    "totalLocations": "Ukupno Lokacija",
+    "deleteLocation": "Obrisi Lokaciju",
+    "noLocations": "Nema lokacija"
   },
   "common": {
     "loading": "Ucitavanje...",

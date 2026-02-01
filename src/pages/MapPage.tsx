@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Header } from '../components/common/Header';
 import { MapContainer } from '../components/map/MapContainer';
@@ -9,51 +9,67 @@ import { useAuth } from '../contexts/AuthContext';
 import { useMap } from '../contexts/MapContext';
 import { useLocations } from '../hooks/useLocations';
 import { useSearch } from '../hooks/useSearch';
-import { createSuggestion } from '../lib/api/suggestions';
 import type { LocationFormData } from '../types';
 
 export function MapPage() {
   const { t } = useTranslation();
-  const { canEdit, user } = useAuth();
-  const { isAddingLocation, setIsAddingLocation, pendingCoordinates, setPendingCoordinates } = useMap();
-  const { addLocation } = useLocations();
+  const { user } = useAuth();
+  const { isAddingLocation, setIsAddingLocation, pendingCoordinates, setPendingCoordinates, selectedLocation, setSelectedLocation } = useMap();
+  const { addLocation, updateLocation } = useLocations();
   const { results, isSearching, query, search, clearSearch } = useSearch();
 
   const [showForm, setShowForm] = useState(false);
   const [showSearchResults, setShowSearchResults] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const handleAddLocation = () => {
     setIsAddingLocation(true);
+    setIsEditMode(false);
+    setSelectedLocation(null);
   };
 
   const handleFormSubmit = async (data: LocationFormData, images?: File[], documents?: File[]) => {
-    if (canEdit) {
-      // Editors can add directly
-      await addLocation(data, images, documents);
-    } else if (user) {
-      // Viewers submit suggestions
-      await createSuggestion(
-        {
-          suggestionType: 'create',
-          suggestedData: data,
-        },
-        user.id
-      );
+    if (!user) return;
+
+    if (isEditMode && selectedLocation) {
+      // Update existing location
+      await updateLocation(selectedLocation.id, data);
+    } else {
+      // Create new location with username
+      await addLocation({
+        ...data,
+        created_by: user.username,
+      }, images, documents);
     }
+
     setShowForm(false);
     setPendingCoordinates(null);
+    setIsEditMode(false);
+    setSelectedLocation(null);
   };
 
   const handleFormCancel = () => {
     setShowForm(false);
     setPendingCoordinates(null);
     setIsAddingLocation(false);
+    setIsEditMode(false);
+    setSelectedLocation(null);
   };
 
-  // Show form when coordinates are selected
-  if (pendingCoordinates && !showForm) {
-    setShowForm(true);
-  }
+  // Show form when coordinates are selected (new location)
+  useEffect(() => {
+    if (pendingCoordinates && !showForm && !isEditMode) {
+      setShowForm(true);
+    }
+  }, [pendingCoordinates, showForm, isEditMode]);
+
+  // Handle edit mode when location is selected
+  useEffect(() => {
+    if (selectedLocation && !showForm) {
+      setIsEditMode(true);
+      setShowForm(true);
+    }
+  }, [selectedLocation, showForm]);
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -95,46 +111,44 @@ export function MapPage() {
               )}
             </div>
 
-            {/* Add location button */}
-            {canEdit && (
-              <button
-                onClick={handleAddLocation}
-                disabled={isAddingLocation}
-                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-                  isAddingLocation
-                    ? 'bg-primary-100 text-primary-700'
-                    : 'bg-primary-600 text-white hover:bg-primary-700'
-                }`}
+            {/* Add location button - everyone can add */}
+            <button
+              onClick={handleAddLocation}
+              disabled={isAddingLocation}
+              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                isAddingLocation
+                  ? 'bg-green-100 text-green-700'
+                  : 'bg-green-600 text-white hover:bg-green-700'
+              }`}
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4v16m8-8H4"
-                  />
-                </svg>
-                <span className="hidden sm:inline">{t('map.addLocation')}</span>
-              </button>
-            )}
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              <span className="hidden sm:inline">{t('map.addLocation')}</span>
+            </button>
           </div>
         </div>
 
         {/* Map instruction banner */}
         {isAddingLocation && (
-          <div className="bg-primary-50 border-b border-primary-200 px-4 py-2">
+          <div className="bg-green-50 border-b border-green-200 px-4 py-2">
             <div className="max-w-7xl mx-auto flex items-center justify-between">
-              <p className="text-sm text-primary-700">
+              <p className="text-sm text-green-700">
                 {t('map.clickToAdd')}
               </p>
               <button
                 onClick={() => setIsAddingLocation(false)}
-                className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+                className="text-sm text-green-600 hover:text-green-700 font-medium"
               >
                 {t('common.cancel')}
               </button>
@@ -143,9 +157,34 @@ export function MapPage() {
         )}
 
         {/* Map */}
-        <div className="flex-1">
+        <div className="flex-1 relative">
           <MapContainer className="h-full" />
         </div>
+
+        {/* Footer with logos */}
+        <footer className="bg-white border-t border-gray-200 px-4 py-3">
+          <div className="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center gap-4">
+              <img
+                src={`${import.meta.env.BASE_URL}logos/bio-rider-logo.svg`}
+                alt="Bio Rider"
+                className="h-10"
+              />
+            </div>
+            <div className="flex items-center gap-6">
+              <img
+                src={`${import.meta.env.BASE_URL}logos/green-mobility-logo.jpeg`}
+                alt="Green Mobility"
+                className="h-8 object-contain"
+              />
+              <img
+                src={`${import.meta.env.BASE_URL}logos/eit-logo.png`}
+                alt="EIT Co-funded"
+                className="h-8 object-contain"
+              />
+            </div>
+          </div>
+        </footer>
       </main>
 
       {/* Location form modal */}
@@ -155,7 +194,13 @@ export function MapPage() {
         size="lg"
       >
         <LocationForm
-          mode={canEdit ? 'create' : 'suggest'}
+          mode={isEditMode ? 'edit' : 'create'}
+          initialData={isEditMode && selectedLocation ? {
+            name: selectedLocation.name,
+            description: selectedLocation.description || '',
+            latitude: selectedLocation.latitude,
+            longitude: selectedLocation.longitude,
+          } : undefined}
           onSubmit={handleFormSubmit}
           onCancel={handleFormCancel}
         />

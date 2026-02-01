@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getLocations, createLocation, updateLocation, deleteLocation } from '../lib/api/locations';
+import { getLocations, createLocation, updateLocation as updateLocationApi, deleteLocation } from '../lib/api/locations';
 import { useMap } from '../contexts/MapContext';
 import type { Location } from '../types';
 
@@ -9,11 +9,11 @@ interface UseLocationsReturn {
   error: Error | null;
   refresh: () => Promise<void>;
   addLocation: (
-    data: { name: string; description?: string; latitude: number; longitude: number },
+    data: { name: string; description?: string; latitude: number; longitude: number; created_by: string },
     images?: File[],
     documents?: File[]
   ) => Promise<Location>;
-  editLocation: (
+  updateLocation: (
     id: string,
     data: { name?: string; description?: string; latitude?: number; longitude?: number }
   ) => Promise<Location>;
@@ -46,7 +46,7 @@ export function useLocations(): UseLocationsReturn {
 
   const addLocation = useCallback(
     async (
-      data: { name: string; description?: string; latitude: number; longitude: number },
+      data: { name: string; description?: string; latitude: number; longitude: number; created_by: string },
       images?: File[],
       documents?: File[]
     ): Promise<Location> => {
@@ -60,12 +60,12 @@ export function useLocations(): UseLocationsReturn {
     [fetchLocations]
   );
 
-  const editLocation = useCallback(
+  const updateLocation = useCallback(
     async (
       id: string,
       data: { name?: string; description?: string; latitude?: number; longitude?: number }
     ): Promise<Location> => {
-      const location = await updateLocation(id, data);
+      const location = await updateLocationApi(id, data);
 
       // Refresh to get updated data
       await fetchLocations();
@@ -91,7 +91,7 @@ export function useLocations(): UseLocationsReturn {
     error,
     refresh: fetchLocations,
     addLocation,
-    editLocation,
+    updateLocation,
     removeLocation,
   };
 }

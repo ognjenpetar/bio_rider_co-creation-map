@@ -2,13 +2,12 @@ import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDropzone } from 'react-dropzone';
 import MDEditor from '@uiw/react-md-editor';
-import { useAuth } from '../../contexts/AuthContext';
 import { useMap } from '../../contexts/MapContext';
 import type { Location, LocationFormData } from '../../types';
 
 interface LocationFormProps {
   initialData?: Partial<Location>;
-  mode: 'create' | 'edit' | 'suggest';
+  mode: 'create' | 'edit';
   onSubmit: (data: LocationFormData, images?: File[], documents?: File[]) => Promise<void>;
   onCancel: () => void;
 }
@@ -34,7 +33,6 @@ export function LocationForm({
   onCancel,
 }: LocationFormProps) {
   const { t } = useTranslation();
-  const { canEdit } = useAuth();
   const { pendingCoordinates, setPendingCoordinates, setIsAddingLocation } = useMap();
 
   const [name, setName] = useState(initialData?.name || '');
@@ -140,12 +138,7 @@ export function LocationForm({
   const titleKey =
     mode === 'create'
       ? 'locationForm.createTitle'
-      : mode === 'edit'
-      ? 'locationForm.editTitle'
-      : 'locationForm.suggestTitle';
-
-  const submitKey =
-    mode === 'suggest' ? 'locationForm.submit' : 'locationForm.save';
+      : 'locationForm.editTitle';
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -168,7 +161,7 @@ export function LocationForm({
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder={t('locationForm.namePlaceholder')}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
           required
         />
       </div>
@@ -206,7 +199,7 @@ export function LocationForm({
               value={latitude || ''}
               onChange={(e) => setLatitude(parseFloat(e.target.value) || 0)}
               step="0.000001"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             />
           </div>
           <div>
@@ -218,135 +211,129 @@ export function LocationForm({
               value={longitude || ''}
               onChange={(e) => setLongitude(parseFloat(e.target.value) || 0)}
               step="0.000001"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
             />
           </div>
         </div>
-        {canEdit && (
-          <button
-            type="button"
-            onClick={handleSelectOnMap}
-            className="text-sm text-primary-600 hover:text-primary-700"
+        <button
+          type="button"
+          onClick={handleSelectOnMap}
+          className="text-sm text-green-600 hover:text-green-700"
+        >
+          {t('locationForm.selectOnMap')}
+        </button>
+      </div>
+
+      {/* Images */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          {t('location.images')}
+        </label>
+        <div
+          {...getImageRootProps()}
+          className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${
+            isImageDragActive
+              ? 'border-green-500 bg-green-50'
+              : 'border-gray-300 hover:border-gray-400'
+          }`}
+        >
+          <input {...getImageInputProps()} />
+          <svg
+            className="mx-auto h-8 w-8 text-gray-400 mb-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
           >
-            {t('locationForm.selectOnMap')}
-          </button>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+            />
+          </svg>
+          <p className="text-sm text-gray-600">{t('locationForm.dropImages')}</p>
+          <p className="text-xs text-gray-400 mt-1">
+            {t('locationForm.supportedImageFormats')}
+          </p>
+        </div>
+
+        {/* Image previews */}
+        {images.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {images.map((file, index) => (
+              <div key={index} className="relative group">
+                <img
+                  src={URL.createObjectURL(file)}
+                  alt=""
+                  className="w-16 h-16 rounded object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeImage(index)}
+                  className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
-      {/* Images - only for create/edit modes */}
-      {(mode === 'create' || mode === 'edit') && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {t('location.images')}
-          </label>
-          <div
-            {...getImageRootProps()}
-            className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${
-              isImageDragActive
-                ? 'border-primary-500 bg-primary-50'
-                : 'border-gray-300 hover:border-gray-400'
-            }`}
+      {/* Documents */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          {t('location.documents')}
+        </label>
+        <div
+          {...getDocRootProps()}
+          className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${
+            isDocDragActive
+              ? 'border-green-500 bg-green-50'
+              : 'border-gray-300 hover:border-gray-400'
+          }`}
+        >
+          <input {...getDocInputProps()} />
+          <svg
+            className="mx-auto h-8 w-8 text-gray-400 mb-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
           >
-            <input {...getImageInputProps()} />
-            <svg
-              className="mx-auto h-8 w-8 text-gray-400 mb-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-            <p className="text-sm text-gray-600">{t('locationForm.dropImages')}</p>
-            <p className="text-xs text-gray-400 mt-1">
-              {t('locationForm.supportedImageFormats')}
-            </p>
-          </div>
-
-          {/* Image previews */}
-          {images.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              {images.map((file, index) => (
-                <div key={index} className="relative group">
-                  <img
-                    src={URL.createObjectURL(file)}
-                    alt=""
-                    className="w-16 h-16 rounded object-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeImage(index)}
-                    className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            />
+          </svg>
+          <p className="text-sm text-gray-600">{t('locationForm.dropDocuments')}</p>
+          <p className="text-xs text-gray-400 mt-1">
+            {t('locationForm.supportedDocFormats')}
+          </p>
         </div>
-      )}
 
-      {/* Documents - only for create/edit modes */}
-      {(mode === 'create' || mode === 'edit') && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            {t('location.documents')}
-          </label>
-          <div
-            {...getDocRootProps()}
-            className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${
-              isDocDragActive
-                ? 'border-primary-500 bg-primary-50'
-                : 'border-gray-300 hover:border-gray-400'
-            }`}
-          >
-            <input {...getDocInputProps()} />
-            <svg
-              className="mx-auto h-8 w-8 text-gray-400 mb-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-            <p className="text-sm text-gray-600">{t('locationForm.dropDocuments')}</p>
-            <p className="text-xs text-gray-400 mt-1">
-              {t('locationForm.supportedDocFormats')}
-            </p>
-          </div>
-
-          {/* Document list */}
-          {documents.length > 0 && (
-            <div className="mt-3 space-y-2">
-              {documents.map((file, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between p-2 bg-gray-50 rounded-lg"
+        {/* Document list */}
+        {documents.length > 0 && (
+          <div className="mt-3 space-y-2">
+            {documents.map((file, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between p-2 bg-gray-50 rounded-lg"
+              >
+                <span className="text-sm text-gray-700 truncate">{file.name}</span>
+                <button
+                  type="button"
+                  onClick={() => removeDocument(index)}
+                  className="text-red-500 hover:text-red-700 text-sm"
                 >
-                  <span className="text-sm text-gray-700 truncate">{file.name}</span>
-                  <button
-                    type="button"
-                    onClick={() => removeDocument(index)}
-                    className="text-red-500 hover:text-red-700 text-sm"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Actions */}
       <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
@@ -361,9 +348,9 @@ export function LocationForm({
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex-1 px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isSubmitting ? t('locationForm.saving') : t(submitKey)}
+          {isSubmitting ? t('locationForm.saving') : t('locationForm.save')}
         </button>
       </div>
     </form>
