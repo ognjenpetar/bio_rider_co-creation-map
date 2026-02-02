@@ -10,6 +10,7 @@ import 'leaflet/dist/leaflet.css';
 
 import { useMap, DEFAULT_CENTER, DEFAULT_ZOOM } from '../../contexts/MapContext';
 import { LocationMarkers } from './LocationMarkers';
+import { DraggableMarker } from './DraggableMarker';
 
 // Fix for default marker icons in React-Leaflet
 import L from 'leaflet';
@@ -72,7 +73,14 @@ interface MapContainerProps {
 }
 
 export function MapContainer({ className = '' }: MapContainerProps) {
-  const { isAddingLocation } = useMap();
+  const { isAddingLocation, pendingCoordinates, setPendingCoordinates } = useMap();
+
+  const handleMarkerPositionChange = useCallback(
+    (lat: number, lng: number) => {
+      setPendingCoordinates({ lat, lng });
+    },
+    [setPendingCoordinates]
+  );
 
   return (
     <div className={`relative ${className}`}>
@@ -94,6 +102,14 @@ export function MapContainer({ className = '' }: MapContainerProps) {
 
         {/* Location markers */}
         <LocationMarkers />
+
+        {/* Draggable marker for new location */}
+        {pendingCoordinates && (
+          <DraggableMarker
+            position={pendingCoordinates}
+            onPositionChange={handleMarkerPositionChange}
+          />
+        )}
       </LeafletMapContainer>
     </div>
   );

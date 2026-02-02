@@ -32,7 +32,8 @@
     "loading": "Loading map...",
     "noLocations": "No locations found",
     "addLocation": "Add Location",
-    "clickToAdd": "Click on the map to add a location"
+    "clickToAdd": "Click on the map to add a location",
+    "dragToMove": "Drag marker to adjust position"
   },
   "location": {
     "name": "Name",
@@ -87,7 +88,13 @@
     "locations": "Locations",
     "totalLocations": "Total Locations",
     "deleteLocation": "Delete Location",
-    "noLocations": "No locations found"
+    "noLocations": "No locations found",
+    "editLocation": "Edit Location",
+    "resetMap": "Reset Map",
+    "resetMapConfirm": "Are you sure you want to delete ALL locations? This action cannot be undone!",
+    "resetMapWarning": "This will permanently delete all {{count}} locations and their associated images and documents.",
+    "resetting": "Resetting...",
+    "viewOnMap": "View on Map"
   },
   "common": {
     "loading": "Loading...",
@@ -101,6 +108,7 @@
     "close": "Close",
     "confirm": "Confirm",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "actions": "Actions"
   }
 }

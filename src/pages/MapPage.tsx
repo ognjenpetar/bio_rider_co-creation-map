@@ -4,7 +4,6 @@ import { Header } from '../components/common/Header';
 import { MapContainer } from '../components/map/MapContainer';
 import { SearchBar, SearchResults } from '../components/search';
 import { LocationForm } from '../components/locations/LocationForm';
-import { Modal } from '../components/common/Modal';
 import { useAuth } from '../contexts/AuthContext';
 import { useMap } from '../contexts/MapContext';
 import { useLocations } from '../hooks/useLocations';
@@ -26,6 +25,7 @@ export function MapPage() {
     setIsAddingLocation(true);
     setIsEditMode(false);
     setSelectedLocation(null);
+    setShowForm(false); // Don't show form until map is clicked
   };
 
   const handleFormSubmit = async (data: LocationFormData, images?: File[], documents?: File[]) => {
@@ -46,6 +46,7 @@ export function MapPage() {
     setPendingCoordinates(null);
     setIsEditMode(false);
     setSelectedLocation(null);
+    setIsAddingLocation(false);
   };
 
   const handleFormCancel = () => {
@@ -75,7 +76,7 @@ export function MapPage() {
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
 
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col overflow-hidden">
         {/* Search and controls bar */}
         <div className="bg-white border-b border-gray-200 px-4 py-3">
           <div className="max-w-7xl mx-auto flex items-center gap-4">
@@ -140,7 +141,7 @@ export function MapPage() {
         </div>
 
         {/* Map instruction banner */}
-        {isAddingLocation && (
+        {isAddingLocation && !showForm && (
           <div className="bg-green-50 border-b border-green-200 px-4 py-2">
             <div className="max-w-7xl mx-auto flex items-center justify-between">
               <p className="text-sm text-green-700">
@@ -156,9 +157,65 @@ export function MapPage() {
           </div>
         )}
 
-        {/* Map */}
-        <div className="flex-1 relative">
-          <MapContainer className="h-full" />
+        {/* Main content area with map and optional form panel */}
+        <div className="flex-1 flex overflow-hidden">
+          {/* Map section */}
+          <div className={`flex-1 relative ${showForm ? 'hidden md:block' : ''}`}>
+            <MapContainer className="h-full" />
+          </div>
+
+          {/* Form panel on the right side */}
+          {showForm && (
+            <div className="w-full md:w-96 lg:w-[420px] bg-white border-l border-gray-200 flex flex-col overflow-hidden">
+              {/* Form header */}
+              <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between bg-gray-50">
+                <h2 className="text-lg font-semibold text-gray-900">
+                  {isEditMode ? t('locationForm.editTitle') : t('locationForm.createTitle')}
+                </h2>
+                <button
+                  onClick={handleFormCancel}
+                  className="p-1 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-200"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Coordinates preview */}
+              {pendingCoordinates && (
+                <div className="px-4 py-2 bg-green-50 border-b border-green-100">
+                  <div className="flex items-center gap-2 text-sm text-green-700">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span className="font-mono text-xs">
+                      {pendingCoordinates.lat.toFixed(6)}, {pendingCoordinates.lng.toFixed(6)}
+                    </span>
+                    <span className="text-green-600 text-xs ml-auto">
+                      {t('map.dragToMove')}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Form content */}
+              <div className="flex-1 overflow-y-auto p-4">
+                <LocationForm
+                  mode={isEditMode ? 'edit' : 'create'}
+                  initialData={isEditMode && selectedLocation ? {
+                    name: selectedLocation.name,
+                    description: selectedLocation.description || '',
+                    latitude: selectedLocation.latitude,
+                    longitude: selectedLocation.longitude,
+                  } : undefined}
+                  onSubmit={handleFormSubmit}
+                  onCancel={handleFormCancel}
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Footer with logos */}
@@ -186,25 +243,6 @@ export function MapPage() {
           </div>
         </footer>
       </main>
-
-      {/* Location form modal */}
-      <Modal
-        isOpen={showForm}
-        onClose={handleFormCancel}
-        size="lg"
-      >
-        <LocationForm
-          mode={isEditMode ? 'edit' : 'create'}
-          initialData={isEditMode && selectedLocation ? {
-            name: selectedLocation.name,
-            description: selectedLocation.description || '',
-            latitude: selectedLocation.latitude,
-            longitude: selectedLocation.longitude,
-          } : undefined}
-          onSubmit={handleFormSubmit}
-          onCancel={handleFormCancel}
-        />
-      </Modal>
     </div>
   );
 }

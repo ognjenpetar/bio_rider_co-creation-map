@@ -32,7 +32,8 @@
     "loading": "Ucitavanje mape...",
     "noLocations": "Nema pronadjenih lokacija",
     "addLocation": "Dodaj Lokaciju",
-    "clickToAdd": "Kliknite na mapu da dodate lokaciju"
+    "clickToAdd": "Kliknite na mapu da dodate lokaciju",
+    "dragToMove": "Prevucite marker za promenu pozicije"
   },
   "location": {
     "name": "Naziv",
@@ -87,7 +88,13 @@
     "locations": "Lokacije",
     "totalLocations": "Ukupno Lokacija",
     "deleteLocation": "Obrisi Lokaciju",
-    "noLocations": "Nema lokacija"
+    "noLocations": "Nema lokacija",
+    "editLocation": "Izmeni Lokaciju",
+    "resetMap": "Resetuj Mapu",
+    "resetMapConfirm": "Da li ste sigurni da zelite da obrisete SVE lokacije? Ova akcija se ne moze poništiti!",
+    "resetMapWarning": "Ovo ce trajno obrisati svih {{count}} lokacija i sve slike i dokumente.",
+    "resetting": "Resetovanje...",
+    "viewOnMap": "Pogledaj na Mapi"
   },
   "common": {
     "loading": "Ucitavanje...",
@@ -101,6 +108,7 @@
     "close": "Zatvori",
     "confirm": "Potvrdi",
     "yes": "Da",
-    "no": "Ne"
+    "no": "Ne",
+    "actions": "Akcije"
   }
 }

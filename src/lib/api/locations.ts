@@ -270,3 +270,18 @@ export async function deleteLocationDocument(id: string, storagePath: string): P
 
   if (error) throw error;
 }
+
+// Reset map - delete all locations (admin only)
+export async function resetAllLocations(): Promise<void> {
+  // Get all locations
+  const { data: locations, error: fetchError } = await supabase
+    .from('locations')
+    .select('id');
+
+  if (fetchError) throw fetchError;
+
+  // Delete each location with its files
+  for (const location of locations || []) {
+    await hardDeleteLocation(location.id);
+  }
+}

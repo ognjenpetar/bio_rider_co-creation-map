@@ -28,7 +28,7 @@ const ACCEPTED_DOC_TYPES = {
 
 export function LocationForm({
   initialData,
-  mode,
+  mode: _mode,
   onSubmit,
   onCancel,
 }: LocationFormProps) {
@@ -135,15 +135,8 @@ export function LocationForm({
     }
   };
 
-  const titleKey =
-    mode === 'create'
-      ? 'locationForm.createTitle'
-      : 'locationForm.editTitle';
-
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <h2 className="text-xl font-semibold text-gray-900">{t(titleKey)}</h2>
-
       {error && (
         <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
           {error}
