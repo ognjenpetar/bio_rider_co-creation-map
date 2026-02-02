@@ -33,7 +33,11 @@
     "noLocations": "Nema pronadjenih lokacija",
     "addLocation": "Dodaj Lokaciju",
     "clickToAdd": "Kliknite na mapu da dodate lokaciju",
-    "dragToMove": "Prevucite marker za promenu pozicije"
+    "dragToMove": "Prevucite marker za promenu pozicije",
+    "viewAllLocations": "Pregledaj Sve Lokacije",
+    "allLocations": "Sve Lokacije",
+    "totalLocations": "{{count}} lokacija",
+    "totalLocations_plural": "{{count}} lokacija"
   },
   "location": {
     "name": "Naziv",

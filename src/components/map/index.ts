@@ -3,3 +3,4 @@ export { LocationMarkers } from './LocationMarkers';
 export { LocationMarker } from './LocationMarker';
 export { MarkerPopup } from './MarkerPopup';
 export { DraggableMarker } from './DraggableMarker';
+export { LocationsList } from './LocationsList';

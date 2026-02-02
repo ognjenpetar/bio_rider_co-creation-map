@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Header } from '../components/common/Header';
-import { MapContainer } from '../components/map/MapContainer';
+import { MapContainer, LocationsList } from '../components/map';
 import { SearchBar, SearchResults } from '../components/search';
 import { LocationForm } from '../components/locations/LocationForm';
 import { useAuth } from '../contexts/AuthContext';
@@ -20,6 +20,7 @@ export function MapPage() {
   const [showForm, setShowForm] = useState(false);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [showLocationsList, setShowLocationsList] = useState(false);
 
   const handleAddLocation = () => {
     setIsAddingLocation(true);
@@ -112,6 +113,31 @@ export function MapPage() {
               )}
             </div>
 
+            {/* View all locations button */}
+            <button
+              onClick={() => setShowLocationsList(!showLocationsList)}
+              className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+                showLocationsList
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'bg-blue-600 text-white hover:bg-blue-700'
+              }`}
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 10h16M4 14h16M4 18h16"
+                />
+              </svg>
+              <span className="hidden sm:inline">{t('map.viewAllLocations')}</span>
+            </button>
+
             {/* Add location button - everyone can add */}
             <button
               onClick={handleAddLocation}
@@ -157,10 +183,15 @@ export function MapPage() {
           </div>
         )}
 
-        {/* Main content area with map and optional form panel */}
+        {/* Main content area with map and optional panels */}
         <div className="flex-1 flex overflow-hidden">
+          {/* Locations list panel on the left side */}
+          {showLocationsList && (
+            <LocationsList onClose={() => setShowLocationsList(false)} />
+          )}
+
           {/* Map section */}
-          <div className={`flex-1 relative ${showForm ? 'hidden md:block' : ''}`}>
+          <div className={`flex-1 relative ${showForm || showLocationsList ? 'hidden md:block' : ''}`}>
             <MapContainer className="h-full" />
           </div>
 

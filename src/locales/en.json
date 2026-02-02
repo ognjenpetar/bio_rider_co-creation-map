@@ -33,7 +33,11 @@
     "noLocations": "No locations found",
     "addLocation": "Add Location",
     "clickToAdd": "Click on the map to add a location",
-    "dragToMove": "Drag marker to adjust position"
+    "dragToMove": "Drag marker to adjust position",
+    "viewAllLocations": "View All Locations",
+    "allLocations": "All Locations",
+    "totalLocations": "{{count}} location",
+    "totalLocations_plural": "{{count}} locations"
   },
   "location": {
     "name": "Name",
