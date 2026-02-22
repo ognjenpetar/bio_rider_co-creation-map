@@ -7,6 +7,7 @@
   },
   "nav": {
     "map": "Mapa",
+    "stats": "Statistika",
     "admin": "Admin Panel"
   },
   "auth": {
@@ -63,6 +64,8 @@
     "editTitle": "Izmeni Lokaciju",
     "namePlaceholder": "Unesite naziv lokacije",
     "descriptionPlaceholder": "Unesite opis (Markdown podrzan)",
+    "descriptionPlaceholderSr": "Unesite opis na srpskom (Markdown podrzan)",
+    "descriptionPlaceholderEn": "Unesite opis na engleskom (Markdown podrzan)",
     "uploadImages": "Dodaj Slike",
     "uploadDocuments": "Dodaj Dokumente",
     "dropImages": "Prevucite slike ovde ili kliknite za izbor",
@@ -95,10 +98,140 @@
     "noLocations": "Nema lokacija",
     "editLocation": "Izmeni Lokaciju",
     "resetMap": "Resetuj Mapu",
-    "resetMapConfirm": "Da li ste sigurni da zelite da obrisete SVE lokacije? Ova akcija se ne moze poništiti!",
+    "resetMapConfirm": "Da li ste sigurni da zelite da obrisete SVE lokacije? Ova akcija se ne moze ponistiti!",
     "resetMapWarning": "Ovo ce trajno obrisati svih {{count}} lokacija i sve slike i dokumente.",
     "resetting": "Resetovanje...",
     "viewOnMap": "Pogledaj na Mapi"
+  },
+  "comments": {
+    "title": "Komentari i Ocene",
+    "addComment": "Dodaj Komentar",
+    "yourRating": "Vasa Ocena",
+    "commentPlaceholder": "Napisite komentar (opciono)",
+    "submit": "Posalji",
+    "noComments": "Nema komentara. Budite prvi!",
+    "deleteComment": "Obrisi",
+    "back": "Nazad"
+  },
+  "share": {
+    "copyLink": "Kopiraj Link",
+    "copied": "Link Kopiran!"
+  },
+  "export": {
+    "title": "Export",
+    "csv": "Export CSV",
+    "geojson": "Export GeoJSON"
+  },
+  "stats": {
+    "title": "Statistika",
+    "totalLocations": "Ukupno Lokacija",
+    "activeUsers": "Aktivni Korisnici",
+    "thisMonth": "Ovog Meseca",
+    "byUser": "Lokacije po Korisniku",
+    "byMonth": "Lokacije po Mesecu",
+    "recentActivity": "Nedavna Aktivnost",
+    "noData": "Nema dostupnih podataka",
+    "growth": "Kumulativni Rast",
+    "userDistribution": "Distribucija Korisnika",
+    "avgRating": "Prosecna Ocena",
+    "totalComments": "Ukupno Komentara"
+  },
+  "layers": {
+    "title": "Slojevi",
+    "heatmap": "Heatmapa Aktivnosti",
+    "routes": "Rute i Putanje"
+  },
+  "routes": {
+    "title": "Rute",
+    "create": "Kreiraj Rutu",
+    "name": "Naziv Rute",
+    "namePlaceholder": "Unesite naziv rute",
+    "type": "Tip Rute",
+    "cycling": "Biciklizam",
+    "walking": "Setnja",
+    "hiking": "Planinarenje",
+    "other": "Ostalo",
+    "distance": "Udaljenost",
+    "estimatedTime": "Procenjeno Vreme",
+    "clickToAddPoints": "Kliknite na mapu da dodate tacke",
+    "undo": "Ponisti",
+    "save": "Sacuvaj Rutu",
+    "saveRoute": "Sacuvaj Rutu",
+    "finish": "Zavrsi i Sacuvaj",
+    "points": "tacaka",
+    "cancel": "Otkazi",
+    "deleteConfirm": "Obrisati ovu rutu?",
+    "noRoutes": "Nema ruta"
+  },
+  "timeMachine": {
+    "title": "Vremeplov",
+    "showAll": "Prikazi Sve",
+    "play": "Pokreni",
+    "pause": "Pauziraj",
+    "locations": "lokacija vidljivo",
+    "locationsVisible": "{{count}} lokacija vidljivo"
+  },
+  "verification": {
+    "verified": "Verifikovano",
+    "verify": "Verifikuj",
+    "unverify": "Ukloni Verifikaciju",
+    "count": "{{count}} verifikacija",
+    "badge": "Verifikovana Lokacija"
+  },
+  "deliberation": {
+    "title": "Deliberacija",
+    "startNew": "Zapocni Diskusiju",
+    "titleLabel": "Naslov Diskusije",
+    "titlePlaceholder": "Sta treba diskutovati?",
+    "descriptionPlaceholder": "Opisite temu...",
+    "phase": "Faza",
+    "phases": {
+      "identification": "Identifikacija Problema",
+      "proposals": "Predlozi",
+      "argumentation": "Argumentacija",
+      "consensus": "Gradnja Konsenzusa",
+      "closed": "Zatvoreno"
+    },
+    "advancePhase": "Sledeca Faza",
+    "entryTypes": {
+      "problem": "Problem",
+      "proposal": "Predlog",
+      "argument_for": "Argument Za",
+      "argument_against": "Argument Protiv",
+      "consensus": "Konsenzus",
+      "comment": "Komentar"
+    },
+    "addEntry": "Dodaj Unos",
+    "contentPlaceholder": "Podelite svoje misljenje...",
+    "noEntries": "Nema unosa. Budite prvi koji ce doprineti!",
+    "noDeliberations": "Nema diskusija.",
+    "deadline": "Rok",
+    "createdBy": "Pokrenuo"
+  },
+  "notifications": {
+    "title": "Obavestenja",
+    "markAllRead": "Oznaci Sve Procitanim",
+    "noNotifications": "Nema obavestenja",
+    "newLocation": "Nova Lokacija",
+    "newComment": "Novi Komentar",
+    "newVerification": "Nova Verifikacija",
+    "newDeliberation": "Nova Diskusija",
+    "newRoute": "Nova Ruta"
+  },
+  "onboarding": {
+    "welcome": "Dobrodosli u Bio Rider!",
+    "welcomeContent": "Ova interaktivna mapa vam pomaze da istrazujete i ko-kreirate lokacije u regionu Uzice-Sevojno. Hajde da napravimo brzu turu!",
+    "map": "Interaktivna mapa prikazuje sve lokacije. Kliknite na marker za detalje, komentare ili pokretanje diskusije.",
+    "addLocation": "Kliknite ovde da pocnete sa dodavanjem nove lokacije. Zatim kliknite na mapu da je postavite.",
+    "search": "Koristite pretragu da pronadjete lokacije po nazivu, opisu ili sadrzaju dokumenata.",
+    "locationsList": "Pogledajte sve lokacije u listi. Kliknite na lokaciju da zumirate na nju na mapi.",
+    "layers": "Ukljucite slojeve mape: heatmapu aktivnosti, rute i Vremeplov da vidite kako se mapa razvijala tokom vremena.",
+    "export": "Exportujte sve podatke o lokacijama kao CSV ili GeoJSON za koriscenje u drugim aplikacijama.",
+    "stats": "Posetite stranicu Statistike za grafikone i uvide o aktivnosti zajednice.",
+    "next": "Dalje",
+    "back": "Nazad",
+    "skip": "Preskoci Turu",
+    "finish": "Krenimo!"
   },
   "common": {
     "loading": "Ucitavanje...",

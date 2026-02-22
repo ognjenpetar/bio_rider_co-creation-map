@@ -58,6 +58,8 @@ export async function createLocation(
   data: {
     name: string;
     description?: string;
+    description_sr?: string;
+    description_en?: string;
     latitude: number;
     longitude: number;
     created_by: string; // Username of the creator
@@ -71,6 +73,8 @@ export async function createLocation(
     .insert({
       name: data.name,
       description: data.description,
+      description_sr: data.description_sr || null,
+      description_en: data.description_en || null,
       latitude: data.latitude,
       longitude: data.longitude,
       created_by: data.created_by,
@@ -106,6 +110,8 @@ export async function updateLocation(
   data: {
     name?: string;
     description?: string;
+    description_sr?: string;
+    description_en?: string;
     latitude?: number;
     longitude?: number;
     preview_image_url?: string;

@@ -51,40 +51,133 @@ body {
 }
 
 /* Marker cluster styles */
-.marker-cluster-small {
-  @apply bg-primary-100;
+.custom-cluster-icon {
+  background: none !important;
+  border: none !important;
 }
 
-.marker-cluster-small div {
-  @apply bg-primary-500 text-white;
+.cluster-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-weight: 700;
+  color: white;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s;
 }
 
-.marker-cluster-medium {
-  @apply bg-primary-200;
+.cluster-marker:hover {
+  transform: scale(1.1);
 }
 
-.marker-cluster-medium div {
-  @apply bg-primary-600 text-white;
+.cluster-marker span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.marker-cluster-large {
-  @apply bg-primary-300;
+.cluster-small {
+  width: 40px;
+  height: 40px;
+  font-size: 14px;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  border: 3px solid rgba(255, 255, 255, 0.8);
 }
 
-.marker-cluster-large div {
-  @apply bg-primary-700 text-white;
+.cluster-medium {
+  width: 48px;
+  height: 48px;
+  font-size: 16px;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  border: 3px solid rgba(255, 255, 255, 0.8);
 }
 
-.marker-cluster {
-  @apply rounded-full;
+.cluster-large {
+  width: 56px;
+  height: 56px;
+  font-size: 18px;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  border: 3px solid rgba(255, 255, 255, 0.8);
 }
 
-.marker-cluster div {
-  @apply rounded-full flex items-center justify-center font-semibold text-sm;
-  width: 30px;
-  height: 30px;
-  margin-left: 5px;
-  margin-top: 5px;
+/* Custom marker icon styles */
+.custom-marker-icon {
+  background: none !important;
+  border: none !important;
+}
+
+.custom-marker-icon:hover > div > div:first-child {
+  transform: rotate(-45deg) scale(1.15);
+}
+
+/* Pulse animation for new locations */
+@keyframes marker-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(34, 197, 94, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
+}
+
+.marker-pulse > div:first-child {
+  animation: marker-pulse 2s ease-in-out infinite;
+}
+
+/* Time machine slider styles */
+input[type="range"].time-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: #e5e7eb;
+  outline: none;
+}
+
+input[type="range"].time-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #7c3aed;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input[type="range"].time-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #7c3aed;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Route polyline label */
+.route-label {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Notification badge animation */
+@keyframes notification-bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+.notification-badge {
+  animation: notification-bounce 0.3s ease-in-out;
 }
 
 /* Markdown editor overrides */

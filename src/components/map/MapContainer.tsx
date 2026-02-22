@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import {
   MapContainer as LeafletMapContainer,
   TileLayer,
@@ -70,9 +70,10 @@ function MapClickHandler() {
 
 interface MapContainerProps {
   className?: string;
+  children?: React.ReactNode;
 }
 
-export function MapContainer({ className = '' }: MapContainerProps) {
+export function MapContainer({ className = '', children }: MapContainerProps) {
   const { isAddingLocation, pendingCoordinates, setPendingCoordinates } = useMap();
 
   const handleMarkerPositionChange = useCallback(
@@ -110,6 +111,9 @@ export function MapContainer({ className = '' }: MapContainerProps) {
             onPositionChange={handleMarkerPositionChange}
           />
         )}
+
+        {/* Additional layers passed as children */}
+        {children}
       </LeafletMapContainer>
     </div>
   );

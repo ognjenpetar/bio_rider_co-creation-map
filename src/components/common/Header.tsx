@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { NotificationBell } from '../map/NotificationBell';
 
 export function Header() {
   const { t } = useTranslation();
@@ -12,6 +13,7 @@ export function Header() {
 
   const navigation = [
     { name: t('nav.map'), href: '/' },
+    { name: t('nav.stats'), href: '/stats' },
     ...(isAdmin ? [{ name: t('nav.admin'), href: '/admin' }] : []),
   ];
 
@@ -55,6 +57,7 @@ export function Header() {
               <Link
                 key={item.href}
                 to={item.href}
+                data-tour={item.href === '/stats' ? 'stats-link' : undefined}
                 className={`text-sm font-medium transition-colors ${
                   isActive(item.href)
                     ? 'text-green-600'
@@ -67,7 +70,8 @@ export function Header() {
           </nav>
 
           {/* Right side */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <NotificationBell />
             <LanguageSwitcher />
 
             {/* User Menu */}

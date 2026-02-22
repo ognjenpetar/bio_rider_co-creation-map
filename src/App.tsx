@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { MapProvider } from './contexts/MapContext';
-import { LoginPage, MapPage, AdminPage } from './pages';
+import { LoginPage, MapPage, AdminPage, StatsPage } from './pages';
 import { LoadingSpinner } from './components/common';
 
 // Handle GitHub Pages SPA redirect
@@ -75,6 +75,16 @@ function AppRoutes() {
               <MapProvider>
                 <MapPage />
               </MapProvider>
+            </RequireAuth>
+          }
+        />
+
+        {/* Stats page - requires login */}
+        <Route
+          path="/stats"
+          element={
+            <RequireAuth>
+              <StatsPage />
             </RequireAuth>
           }
         />

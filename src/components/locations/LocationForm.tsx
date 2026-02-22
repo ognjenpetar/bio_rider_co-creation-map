@@ -37,6 +37,9 @@ export function LocationForm({
 
   const [name, setName] = useState(initialData?.name || '');
   const [description, setDescription] = useState(initialData?.description || '');
+  const [descriptionSr, setDescriptionSr] = useState(initialData?.description_sr || '');
+  const [descriptionEn, setDescriptionEn] = useState(initialData?.description_en || '');
+  const [descriptionTab, setDescriptionTab] = useState<'sr' | 'en'>('sr');
   const [latitude, setLatitude] = useState(
     pendingCoordinates?.lat ?? initialData?.latitude ?? 0
   );
@@ -121,6 +124,8 @@ export function LocationForm({
         {
           name: name.trim(),
           description: description.trim(),
+          description_sr: descriptionSr.trim() || undefined,
+          description_en: descriptionEn.trim() || undefined,
           latitude,
           longitude,
         },
@@ -159,21 +164,60 @@ export function LocationForm({
         />
       </div>
 
-      {/* Description */}
+      {/* Description with language tabs */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           {t('location.description')}
         </label>
+        <div className="flex gap-1 mb-2">
+          <button
+            type="button"
+            onClick={() => setDescriptionTab('sr')}
+            className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+              descriptionTab === 'sr'
+                ? 'bg-green-600 text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            Srpski
+          </button>
+          <button
+            type="button"
+            onClick={() => setDescriptionTab('en')}
+            className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+              descriptionTab === 'en'
+                ? 'bg-green-600 text-white'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            English
+          </button>
+        </div>
         <div data-color-mode="light">
-          <MDEditor
-            value={description}
-            onChange={(value) => setDescription(value || '')}
-            preview="edit"
-            height={200}
-            textareaProps={{
-              placeholder: t('locationForm.descriptionPlaceholder'),
-            }}
-          />
+          {descriptionTab === 'sr' ? (
+            <MDEditor
+              value={descriptionSr}
+              onChange={(value) => {
+                setDescriptionSr(value || '');
+                setDescription(value || '');
+              }}
+              preview="edit"
+              height={200}
+              textareaProps={{
+                placeholder: t('locationForm.descriptionPlaceholderSr'),
+              }}
+            />
+          ) : (
+            <MDEditor
+              value={descriptionEn}
+              onChange={(value) => setDescriptionEn(value || '')}
+              preview="edit"
+              height={200}
+              textareaProps={{
+                placeholder: t('locationForm.descriptionPlaceholderEn'),
+              }}
+            />
+          )}
         </div>
       </div>
 

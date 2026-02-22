@@ -7,7 +7,7 @@ interface LocationsListProps {
 }
 
 export function LocationsList({ onClose }: LocationsListProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { locations, centerOnLocation } = useMap();
 
   const handleLocationClick = (location: Location) => {
@@ -83,12 +83,15 @@ export function LocationsList({ onClose }: LocationsListProps) {
                       </h3>
                     </div>
 
-                    {/* Description */}
-                    {location.description && (
-                      <p className="text-xs text-gray-600 line-clamp-2 mb-2">
-                        {location.description}
-                      </p>
-                    )}
+                    {/* Description - localized */}
+                    {(() => {
+                      const desc = (i18n.language === 'sr' ? location.description_sr : location.description_en) || location.description;
+                      return desc ? (
+                        <p className="text-xs text-gray-600 line-clamp-2 mb-2">
+                          {desc}
+                        </p>
+                      ) : null;
+                    })()}
 
                     {/* Meta info */}
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">

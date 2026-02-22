@@ -7,6 +7,7 @@
   },
   "nav": {
     "map": "Map",
+    "stats": "Statistics",
     "admin": "Admin Panel"
   },
   "auth": {
@@ -63,6 +64,8 @@
     "editTitle": "Edit Location",
     "namePlaceholder": "Enter location name",
     "descriptionPlaceholder": "Enter description (Markdown supported)",
+    "descriptionPlaceholderSr": "Enter description in Serbian (Markdown supported)",
+    "descriptionPlaceholderEn": "Enter description in English (Markdown supported)",
     "uploadImages": "Upload Images",
     "uploadDocuments": "Upload Documents",
     "dropImages": "Drop images here or click to browse",
@@ -99,6 +102,136 @@
     "resetMapWarning": "This will permanently delete all {{count}} locations and their associated images and documents.",
     "resetting": "Resetting...",
     "viewOnMap": "View on Map"
+  },
+  "comments": {
+    "title": "Comments & Ratings",
+    "addComment": "Add Comment",
+    "yourRating": "Your Rating",
+    "commentPlaceholder": "Write a comment (optional)",
+    "submit": "Submit",
+    "noComments": "No comments yet. Be the first!",
+    "deleteComment": "Delete",
+    "back": "Back"
+  },
+  "share": {
+    "copyLink": "Copy Link",
+    "copied": "Link Copied!"
+  },
+  "export": {
+    "title": "Export",
+    "csv": "Export CSV",
+    "geojson": "Export GeoJSON"
+  },
+  "stats": {
+    "title": "Statistics",
+    "totalLocations": "Total Locations",
+    "activeUsers": "Active Users",
+    "thisMonth": "This Month",
+    "byUser": "Locations by User",
+    "byMonth": "Locations by Month",
+    "recentActivity": "Recent Activity",
+    "noData": "No data available",
+    "growth": "Cumulative Growth",
+    "userDistribution": "User Distribution",
+    "avgRating": "Avg Rating",
+    "totalComments": "Total Comments"
+  },
+  "layers": {
+    "title": "Layers",
+    "heatmap": "Activity Heatmap",
+    "routes": "Routes & Paths"
+  },
+  "routes": {
+    "title": "Routes",
+    "create": "Create Route",
+    "name": "Route Name",
+    "namePlaceholder": "Enter route name",
+    "type": "Route Type",
+    "cycling": "Cycling",
+    "walking": "Walking",
+    "hiking": "Hiking",
+    "other": "Other",
+    "distance": "Distance",
+    "estimatedTime": "Est. Time",
+    "clickToAddPoints": "Click on map to add waypoints",
+    "undo": "Undo",
+    "save": "Save Route",
+    "saveRoute": "Save Route",
+    "finish": "Finish & Save",
+    "points": "points",
+    "cancel": "Cancel",
+    "deleteConfirm": "Delete this route?",
+    "noRoutes": "No routes yet"
+  },
+  "timeMachine": {
+    "title": "Time Machine",
+    "showAll": "Show All",
+    "play": "Play",
+    "pause": "Pause",
+    "locations": "locations visible",
+    "locationsVisible": "{{count}} locations visible"
+  },
+  "verification": {
+    "verified": "Verified",
+    "verify": "Verify",
+    "unverify": "Remove Verification",
+    "count": "{{count}} verifications",
+    "badge": "Verified Location"
+  },
+  "deliberation": {
+    "title": "Deliberation",
+    "startNew": "Start Discussion",
+    "titleLabel": "Discussion Title",
+    "titlePlaceholder": "What should be discussed?",
+    "descriptionPlaceholder": "Describe the topic...",
+    "phase": "Phase",
+    "phases": {
+      "identification": "Problem Identification",
+      "proposals": "Proposals",
+      "argumentation": "Argumentation",
+      "consensus": "Consensus Building",
+      "closed": "Closed"
+    },
+    "advancePhase": "Advance Phase",
+    "entryTypes": {
+      "problem": "Problem",
+      "proposal": "Proposal",
+      "argument_for": "Argument For",
+      "argument_against": "Argument Against",
+      "consensus": "Consensus",
+      "comment": "Comment"
+    },
+    "addEntry": "Add Entry",
+    "contentPlaceholder": "Share your thoughts...",
+    "noEntries": "No entries yet. Be the first to contribute!",
+    "noDeliberations": "No discussions yet.",
+    "deadline": "Deadline",
+    "createdBy": "Started by"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark All Read",
+    "noNotifications": "No notifications",
+    "newLocation": "New Location",
+    "newComment": "New Comment",
+    "newVerification": "New Verification",
+    "newDeliberation": "New Discussion",
+    "newRoute": "New Route"
+  },
+  "onboarding": {
+    "welcome": "Welcome to Bio Rider!",
+    "welcomeContent": "This interactive map helps you explore and co-create locations in the Uzice-Sevojno region. Let's take a quick tour!",
+    "map": "The interactive map shows all locations. Click any marker to see details, leave comments, or start a discussion.",
+    "addLocation": "Click here to start adding a new location. Then click on the map to place it.",
+    "search": "Use the search bar to find locations by name, description, or even document content.",
+    "locationsList": "View all locations in a scrollable list. Click any location to zoom to it on the map.",
+    "layers": "Toggle map layers: activity heatmap, routes, and the Time Machine to see how the map evolved over time.",
+    "export": "Export all location data as CSV or GeoJSON for use in other applications.",
+    "stats": "Visit the Statistics page for charts and insights about the community's activity.",
+    "next": "Next",
+    "back": "Back",
+    "skip": "Skip Tour",
+    "finish": "Let's Go!"
   },
   "common": {
     "loading": "Loading...",

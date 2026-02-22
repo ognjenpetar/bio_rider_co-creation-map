@@ -47,6 +47,8 @@ export interface Database {
           id: string;
           name: string;
           description: string | null;
+          description_en: string | null;
+          description_sr: string | null;
           latitude: number;
           longitude: number;
           preview_image_url: string | null;
@@ -59,6 +61,8 @@ export interface Database {
           id?: string;
           name: string;
           description?: string | null;
+          description_en?: string | null;
+          description_sr?: string | null;
           latitude: number;
           longitude: number;
           preview_image_url?: string | null;
@@ -71,6 +75,8 @@ export interface Database {
           id?: string;
           name?: string;
           description?: string | null;
+          description_en?: string | null;
+          description_sr?: string | null;
           latitude?: number;
           longitude?: number;
           preview_image_url?: string | null;
@@ -78,6 +84,33 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
           is_active?: boolean;
+        };
+        Relationships: [];
+      };
+      location_comments: {
+        Row: {
+          id: string;
+          location_id: string;
+          username: string;
+          comment: string | null;
+          rating: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          location_id: string;
+          username: string;
+          comment?: string | null;
+          rating: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          location_id?: string;
+          username?: string;
+          comment?: string | null;
+          rating?: number;
+          created_at?: string;
         };
         Relationships: [];
       };
@@ -155,6 +188,204 @@ export interface Database {
           extracted_text?: string | null;
           extraction_status?: 'pending' | 'completed' | 'failed';
           created_by?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      location_verifications: {
+        Row: {
+          id: string;
+          location_id: string;
+          username: string;
+          verified: boolean;
+          comment: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          location_id: string;
+          username: string;
+          verified?: boolean;
+          comment?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          location_id?: string;
+          username?: string;
+          verified?: boolean;
+          comment?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      routes: {
+        Row: {
+          id: string;
+          name: string;
+          description: string | null;
+          waypoints: Json;
+          color: string;
+          created_by: string;
+          distance_km: number | null;
+          estimated_time_min: number | null;
+          route_type: 'cycling' | 'walking' | 'hiking' | 'other';
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          description?: string | null;
+          waypoints: Json;
+          color?: string;
+          created_by: string;
+          distance_km?: number | null;
+          estimated_time_min?: number | null;
+          route_type?: 'cycling' | 'walking' | 'hiking' | 'other';
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          description?: string | null;
+          waypoints?: Json;
+          color?: string;
+          created_by?: string;
+          distance_km?: number | null;
+          estimated_time_min?: number | null;
+          route_type?: 'cycling' | 'walking' | 'hiking' | 'other';
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      deliberations: {
+        Row: {
+          id: string;
+          location_id: string;
+          title: string;
+          description: string | null;
+          phase: 'identification' | 'proposals' | 'argumentation' | 'consensus' | 'closed';
+          created_by: string;
+          deadline: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          location_id: string;
+          title: string;
+          description?: string | null;
+          phase?: 'identification' | 'proposals' | 'argumentation' | 'consensus' | 'closed';
+          created_by: string;
+          deadline?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          location_id?: string;
+          title?: string;
+          description?: string | null;
+          phase?: 'identification' | 'proposals' | 'argumentation' | 'consensus' | 'closed';
+          created_by?: string;
+          deadline?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      deliberation_entries: {
+        Row: {
+          id: string;
+          deliberation_id: string;
+          username: string;
+          entry_type: 'problem' | 'proposal' | 'argument_for' | 'argument_against' | 'consensus' | 'comment';
+          content: string;
+          votes_up: number;
+          votes_down: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          deliberation_id: string;
+          username: string;
+          entry_type?: 'problem' | 'proposal' | 'argument_for' | 'argument_against' | 'consensus' | 'comment';
+          content: string;
+          votes_up?: number;
+          votes_down?: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          deliberation_id?: string;
+          username?: string;
+          entry_type?: 'problem' | 'proposal' | 'argument_for' | 'argument_against' | 'consensus' | 'comment';
+          content?: string;
+          votes_up?: number;
+          votes_down?: number;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      deliberation_votes: {
+        Row: {
+          id: string;
+          entry_id: string;
+          username: string;
+          vote_type: 'up' | 'down';
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          entry_id: string;
+          username: string;
+          vote_type: 'up' | 'down';
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          entry_id?: string;
+          username?: string;
+          vote_type?: 'up' | 'down';
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      notifications: {
+        Row: {
+          id: string;
+          username: string;
+          type: 'new_location' | 'new_comment' | 'verification' | 'deliberation' | 'route';
+          title: string;
+          message: string | null;
+          reference_id: string | null;
+          is_read: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          username: string;
+          type?: 'new_location' | 'new_comment' | 'verification' | 'deliberation' | 'route';
+          title: string;
+          message?: string | null;
+          reference_id?: string | null;
+          is_read?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          username?: string;
+          type?: 'new_location' | 'new_comment' | 'verification' | 'deliberation' | 'route';
+          title?: string;
+          message?: string | null;
+          reference_id?: string | null;
+          is_read?: boolean;
           created_at?: string;
         };
         Relationships: [];
