@@ -8,6 +8,8 @@ import { MapContainer, LocationsList } from '../components/map';
 import { HeatmapLayer } from '../components/map/HeatmapLayer';
 import { RouteLayer } from '../components/map/RouteLayer';
 import { RouteCreatorLayer } from '../components/map/RouteCreator';
+import { PolygonCreatorLayer } from '../components/map/PolygonCreatorLayer';
+import { ZoneLayer } from '../components/map/ZoneLayer';
 import { TimeMachineSlider } from '../components/map/TimeMachineSlider';
 import { SearchBar, SearchResults } from '../components/search';
 import { LocationForm } from '../components/locations/LocationForm';
@@ -17,7 +19,8 @@ import { useLocations } from '../hooks/useLocations';
 import { useSearch } from '../hooks/useSearch';
 import { exportAsCSV, exportAsGeoJSON } from '../lib/export';
 import { createRoute } from '../lib/api/routes';
-import type { Location, LocationFormData, Coordinates } from '../types';
+import { createZone } from '../lib/api/zones';
+import type { Location, LocationFormData, Coordinates, ZoneType } from '../types';
 
 // Haversine formula for route distance calculation
 function calcDistance(waypoints: Coordinates[]): number {
@@ -58,6 +61,7 @@ export function MapPage() {
   // Layer states
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [showRoutes, setShowRoutes] = useState(false);
+  const [showZones, setShowZones] = useState(false);
   const [showTimeMachine, setShowTimeMachine] = useState(false);
   const [filteredLocations, setFilteredLocations] = useState<Location[] | null>(null);
   const [showLayersMenu, setShowLayersMenu] = useState(false);
@@ -69,6 +73,15 @@ export function MapPage() {
   const [routeName, setRouteName] = useState('');
   const [routeType, setRouteType] = useState<'cycling' | 'walking' | 'hiking' | 'other'>('cycling');
   const [routeSaving, setRouteSaving] = useState(false);
+
+  // Zone creation state
+  const [isCreatingZone, setIsCreatingZone] = useState(false);
+  const [zoneVertices, setZoneVertices] = useState<Coordinates[]>([]);
+  const [showZoneSaveForm, setShowZoneSaveForm] = useState(false);
+  const [zoneName, setZoneName] = useState('');
+  const [zoneType, setZoneType] = useState<ZoneType>('other');
+  const [zoneSaving, setZoneSaving] = useState(false);
+  const [zoneRefresh, setZoneRefresh] = useState(0);
 
   // Handle shared location link (?location=ID)
   useEffect(() => {
@@ -128,9 +141,9 @@ export function MapPage() {
   // Route creation handlers
   const handleStartRouteCreation = () => {
     setIsCreatingRoute(true);
+    setIsCreatingZone(false);
     setRouteWaypoints([]);
     setShowLayersMenu(false);
-    // Disable location adding while creating route
     setIsAddingLocation(false);
   };
 
@@ -156,7 +169,7 @@ export function MapPage() {
       });
       handleCancelRoute();
       setRouteName('');
-      setShowRoutes(true); // show the saved route
+      setShowRoutes(true);
     } catch {
       // ignore
     } finally {
@@ -164,8 +177,46 @@ export function MapPage() {
     }
   };
 
+  // Zone creation handlers
+  const handleStartZoneCreation = () => {
+    setIsCreatingZone(true);
+    setIsCreatingRoute(false);
+    setZoneVertices([]);
+    setShowLayersMenu(false);
+    setIsAddingLocation(false);
+  };
+
+  const handleCancelZone = () => {
+    setIsCreatingZone(false);
+    setZoneVertices([]);
+    setShowZoneSaveForm(false);
+  };
+
+  const handleSaveZone = async () => {
+    if (!zoneName.trim() || zoneVertices.length < 3 || !user?.username) return;
+    setZoneSaving(true);
+    try {
+      await createZone({
+        name: zoneName.trim(),
+        vertices: zoneVertices,
+        created_by: user.username,
+        zone_type: zoneType,
+      });
+      handleCancelZone();
+      setZoneName('');
+      setZoneType('other');
+      setShowZones(true);
+      setZoneRefresh(prev => prev + 1);
+    } catch {
+      // ignore
+    } finally {
+      setZoneSaving(false);
+    }
+  };
+
   const routeDistance = calcDistance(routeWaypoints);
   const displayedLocations = filteredLocations || mapLocations;
+  const isDrawing = isCreatingRoute || isCreatingZone;
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -175,7 +226,7 @@ export function MapPage() {
       <main className="flex-1 flex flex-col overflow-hidden">
         {/* Toolbar */}
         <div className="bg-white border-b border-gray-200 px-4 py-3">
-          <div className="max-w-7xl mx-auto flex items-center gap-2 sm:gap-4 flex-wrap">
+          <div className="max-w-7xl mx-auto flex items-center gap-2 sm:gap-3 flex-wrap">
 
             {/* Search */}
             <div className="flex-1 min-w-[200px] max-w-xl relative" data-tour="search">
@@ -211,18 +262,54 @@ export function MapPage() {
               <span className="hidden sm:inline">{t('map.viewAllLocations')}</span>
             </button>
 
+            {/* ─── Draw Route (dedicated button) ─── */}
+            <button
+              onClick={isCreatingRoute ? handleCancelRoute : handleStartRouteCreation}
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                isCreatingRoute
+                  ? 'bg-blue-100 text-blue-700 ring-2 ring-blue-400'
+                  : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-700'
+              }`}
+              title={t('routes.create')}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+              </svg>
+              <span className="hidden sm:inline">
+                {isCreatingRoute ? t('common.cancel') : t('routes.draw')}
+              </span>
+            </button>
+
+            {/* ─── Draw Zone (dedicated button) ─── */}
+            <button
+              onClick={isCreatingZone ? handleCancelZone : handleStartZoneCreation}
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                isCreatingZone
+                  ? 'bg-indigo-100 text-indigo-700 ring-2 ring-indigo-400'
+                  : 'bg-gray-100 text-gray-700 hover:bg-indigo-50 hover:text-indigo-700'
+              }`}
+              title={t('zones.draw')}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2H5z" />
+              </svg>
+              <span className="hidden sm:inline">
+                {isCreatingZone ? t('common.cancel') : t('zones.draw')}
+              </span>
+            </button>
+
             {/* Layers menu */}
             <div className="relative" data-tour="layers">
               <button
                 onClick={() => setShowLayersMenu(!showLayersMenu)}
                 className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                  showHeatmap || showRoutes || showTimeMachine || isCreatingRoute
+                  showHeatmap || showRoutes || showZones || showTimeMachine
                     ? 'bg-indigo-100 text-indigo-700'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h18M3 8h18M3 12h18" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                 </svg>
                 <span className="hidden sm:inline">{t('layers.title')}</span>
               </button>
@@ -263,18 +350,19 @@ export function MapPage() {
                       </div>
                     </label>
 
-                    <hr className="my-1 border-gray-100" />
-
-                    {/* Create route */}
-                    <button
-                      onClick={handleStartRouteCreation}
-                      className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-50 text-left"
-                    >
-                      <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                      </svg>
-                      <span className="text-sm text-gray-700 font-medium">{t('routes.create')}</span>
-                    </button>
+                    {/* Zones toggle */}
+                    <label className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={showZones}
+                        onChange={e => setShowZones(e.target.checked)}
+                        className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500"
+                      />
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 rounded border-2 border-indigo-500 bg-indigo-100 opacity-70" />
+                        <span className="text-sm text-gray-700">{t('layers.zones')}</span>
+                      </div>
+                    </label>
 
                     <hr className="my-1 border-gray-100" />
 
@@ -326,7 +414,7 @@ export function MapPage() {
             <button
               data-tour="add-location"
               onClick={handleAddLocation}
-              disabled={isAddingLocation || isCreatingRoute}
+              disabled={isAddingLocation || isDrawing}
               className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                 isAddingLocation ? 'bg-green-100 text-green-700' : 'bg-green-600 text-white hover:bg-green-700'
               } disabled:opacity-60`}
@@ -406,6 +494,54 @@ export function MapPage() {
           )}
         </AnimatePresence>
 
+        {/* Zone creation banner */}
+        <AnimatePresence>
+          {isCreatingZone && !showZoneSaveForm && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="bg-indigo-50 border-b border-indigo-200 px-4 py-2 overflow-hidden"
+            >
+              <div className="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-2">
+                <div className="flex items-center gap-3">
+                  <svg className="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2H5z" />
+                  </svg>
+                  <p className="text-sm text-indigo-700 font-medium">
+                    {t('zones.clickToAddVertices')} &mdash; {zoneVertices.length} {t('zones.vertices')}
+                    {zoneVertices.length >= 3 && ` | ${t('zones.polygonReady')}`}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  {zoneVertices.length > 0 && (
+                    <button
+                      onClick={() => setZoneVertices(prev => prev.slice(0, -1))}
+                      className="px-3 py-1 text-sm bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200"
+                    >
+                      {t('routes.undo')}
+                    </button>
+                  )}
+                  {zoneVertices.length >= 3 && (
+                    <button
+                      onClick={() => setShowZoneSaveForm(true)}
+                      className="px-3 py-1 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                    >
+                      {t('zones.finish')}
+                    </button>
+                  )}
+                  <button
+                    onClick={handleCancelZone}
+                    className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded-lg hover:bg-red-200"
+                  >
+                    {t('common.cancel')}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         {/* Main content */}
         <div className="flex-1 flex overflow-hidden relative" data-tour="map">
 
@@ -429,10 +565,16 @@ export function MapPage() {
             <MapContainer className="h-full">
               <HeatmapLayer locations={displayedLocations} visible={showHeatmap} />
               <RouteLayer visible={showRoutes} />
+              <ZoneLayer visible={showZones} refreshTrigger={zoneRefresh} />
               <RouteCreatorLayer
                 active={isCreatingRoute}
                 waypoints={routeWaypoints}
                 onAddWaypoint={(coords) => setRouteWaypoints(prev => [...prev, coords])}
+              />
+              <PolygonCreatorLayer
+                active={isCreatingZone}
+                vertices={zoneVertices}
+                onAddVertex={(coords) => setZoneVertices(prev => [...prev, coords])}
               />
             </MapContainer>
 
@@ -568,6 +710,69 @@ export function MapPage() {
                   className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 disabled:opacity-50"
                 >
                   {routeSaving ? t('locationForm.saving') : t('common.save')}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Zone save modal - rendered at root level, fully outside map */}
+      <AnimatePresence>
+        {showZoneSaveForm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-sm"
+            onClick={e => { if (e.target === e.currentTarget) setShowZoneSaveForm(false); }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm mx-4"
+            >
+              <h3 className="font-bold text-lg text-gray-900 mb-1">{t('zones.saveZone')}</h3>
+              <p className="text-sm text-gray-500 mb-4">
+                {zoneVertices.length} {t('zones.vertices')}
+              </p>
+
+              <input
+                type="text"
+                value={zoneName}
+                onChange={e => setZoneName(e.target.value)}
+                placeholder={t('zones.namePlaceholder')}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                autoFocus
+              />
+
+              <select
+                value={zoneType}
+                onChange={e => setZoneType(e.target.value as ZoneType)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="park">🌳 {t('zones.types.park')}</option>
+                <option value="cycling">🚲 {t('zones.types.cycling')}</option>
+                <option value="restricted">⚠️ {t('zones.types.restricted')}</option>
+                <option value="residential">🏠 {t('zones.types.residential')}</option>
+                <option value="commercial">🏪 {t('zones.types.commercial')}</option>
+                <option value="other">📍 {t('zones.types.other')}</option>
+              </select>
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowZoneSaveForm(false)}
+                  className="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200"
+                >
+                  {t('common.cancel')}
+                </button>
+                <button
+                  onClick={handleSaveZone}
+                  disabled={zoneSaving || !zoneName.trim()}
+                  className="flex-1 px-3 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700 disabled:opacity-50"
+                >
+                  {zoneSaving ? t('locationForm.saving') : t('common.save')}
                 </button>
               </div>
             </motion.div>

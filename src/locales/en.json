@@ -139,7 +139,25 @@
   "layers": {
     "title": "Layers",
     "heatmap": "Activity Heatmap",
-    "routes": "Routes & Paths"
+    "routes": "Routes & Paths",
+    "zones": "Zones & Areas"
+  },
+  "zones": {
+    "draw": "Draw Zone",
+    "saveZone": "Save Zone",
+    "namePlaceholder": "Enter zone name",
+    "clickToAddVertices": "Click on map to add vertices",
+    "vertices": "vertices",
+    "polygonReady": "polygon ready",
+    "finish": "Finish & Save",
+    "types": {
+      "park": "Park",
+      "cycling": "Cycling Zone",
+      "restricted": "Restricted Area",
+      "residential": "Residential",
+      "commercial": "Commercial",
+      "other": "Other"
+    }
   },
   "routes": {
     "title": "Routes",

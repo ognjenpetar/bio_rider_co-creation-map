@@ -139,7 +139,25 @@
   "layers": {
     "title": "Slojevi",
     "heatmap": "Heatmapa Aktivnosti",
-    "routes": "Rute i Putanje"
+    "routes": "Rute i Putanje",
+    "zones": "Zone i Podrucja"
+  },
+  "zones": {
+    "draw": "Crtaj Zonu",
+    "saveZone": "Sacuvaj Zonu",
+    "namePlaceholder": "Unesite naziv zone",
+    "clickToAddVertices": "Kliknite na mapu da dodate temena poligona",
+    "vertices": "temena",
+    "polygonReady": "poligon spreman",
+    "finish": "Zavrsi i Sacuvaj",
+    "types": {
+      "park": "Park",
+      "cycling": "Zona za Biciklizam",
+      "restricted": "Zabranjena Zona",
+      "residential": "Stambena Zona",
+      "commercial": "Komercijalna Zona",
+      "other": "Ostalo"
+    }
   },
   "routes": {
     "title": "Rute",

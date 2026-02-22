@@ -151,6 +151,23 @@ export interface DeliberationEntry {
   created_at: string;
 }
 
+// Zone type (polygon area)
+export type ZoneType = 'park' | 'cycling' | 'restricted' | 'residential' | 'commercial' | 'other';
+
+export interface Zone {
+  id: string;
+  name: string;
+  description: string | null;
+  vertices: Array<{ lat: number; lng: number }>;
+  color: string;
+  fill_color: string;
+  created_by: string;
+  zone_type: ZoneType;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 // Notification type
 export interface Notification {
   id: string;

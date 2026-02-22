@@ -390,6 +390,48 @@ export interface Database {
         };
         Relationships: [];
       };
+      zones: {
+        Row: {
+          id: string;
+          name: string;
+          description: string | null;
+          vertices: Json;
+          color: string;
+          fill_color: string;
+          created_by: string;
+          zone_type: 'park' | 'cycling' | 'restricted' | 'residential' | 'commercial' | 'other';
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          description?: string | null;
+          vertices: Json;
+          color?: string;
+          fill_color?: string;
+          created_by: string;
+          zone_type?: 'park' | 'cycling' | 'restricted' | 'residential' | 'commercial' | 'other';
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          name?: string;
+          description?: string | null;
+          vertices?: Json;
+          color?: string;
+          fill_color?: string;
+          created_by?: string;
+          zone_type?: 'park' | 'cycling' | 'restricted' | 'residential' | 'commercial' | 'other';
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       edit_suggestions: {
         Row: {
           id: string;
