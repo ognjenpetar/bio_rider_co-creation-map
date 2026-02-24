@@ -9,10 +9,15 @@ export async function getZones(): Promise<Zone[]> {
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return (data || []).map(z => ({
-    ...z,
-    vertices: (z.vertices as Array<{ lat: number; lng: number }>) || [],
-  }));
+  return (data || []).map(z => {
+    const raw = z.vertices;
+    const vertices: Array<{ lat: number; lng: number }> = Array.isArray(raw)
+      ? raw
+      : typeof raw === 'string'
+        ? JSON.parse(raw)
+        : [];
+    return { ...z, vertices };
+  });
 }
 
 export async function createZone(data: {
@@ -29,7 +34,7 @@ export async function createZone(data: {
     .insert({
       name: data.name,
       description: data.description || null,
-      vertices: JSON.stringify(data.vertices),
+      vertices: data.vertices as unknown as string,
       color: data.color || '#6366f1',
       fill_color: data.fill_color || '#a5b4fc',
       created_by: data.created_by,
