@@ -9,10 +9,15 @@ export async function getRoutes(): Promise<Route[]> {
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return (data || []).map(r => ({
-    ...r,
-    waypoints: (r.waypoints as Array<{ lat: number; lng: number }>) || [],
-  }));
+  return (data || []).map(r => {
+    const raw = r.waypoints;
+    const waypoints: Array<{ lat: number; lng: number }> = Array.isArray(raw)
+      ? raw
+      : typeof raw === 'string'
+        ? JSON.parse(raw)
+        : [];
+    return { ...r, waypoints };
+  });
 }
 
 export async function createRoute(data: {
@@ -30,7 +35,7 @@ export async function createRoute(data: {
     .insert({
       name: data.name,
       description: data.description || null,
-      waypoints: JSON.stringify(data.waypoints),
+      waypoints: data.waypoints as unknown as string,
       color: data.color || '#22c55e',
       created_by: data.created_by,
       route_type: data.route_type || 'cycling',
