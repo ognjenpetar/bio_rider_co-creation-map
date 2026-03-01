@@ -111,7 +111,14 @@
     "submit": "Posalji",
     "noComments": "Nema komentara. Budite prvi!",
     "deleteComment": "Obrisi",
-    "back": "Nazad"
+    "back": "Nazad",
+    "addImage": "Dodaj Sliku",
+    "removeImage": "Ukloni"
+  },
+  "votes": {
+    "upvote": "Glasaj Za",
+    "downvote": "Glasaj Protiv",
+    "popular": "Popularno"
   },
   "share": {
     "copyLink": "Kopiraj Link",

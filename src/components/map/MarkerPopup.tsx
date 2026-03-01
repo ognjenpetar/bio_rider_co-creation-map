@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 import { useMap } from '../../contexts/MapContext';
 import { getAverageRating } from '../../lib/api/comments';
+import { voteLocation, removeVote, getUserVote, getLocationVoteCounts } from '../../lib/api/votes';
 import { StarRating } from './StarRating';
 import { LocationComments } from './LocationComments';
 import { VerificationBadge } from './VerificationBadge';
@@ -24,6 +25,11 @@ export function MarkerPopup({ location, onEdit, onDelete }: MarkerPopupProps) {
   const [avgRating, setAvgRating] = useState({ average: 0, count: 0 });
   const [copied, setCopied] = useState(false);
 
+  // Vote state
+  const [voteCounts, setVoteCounts] = useState({ up: location.votes_up ?? 0, down: location.votes_down ?? 0 });
+  const [userVote, setUserVote] = useState<'up' | 'down' | null>(null);
+  const [isVoting, setIsVoting] = useState(false);
+
   const canEdit = isAdmin || user?.username === location.created_by;
   const canDelete = isAdmin;
 
@@ -41,7 +47,31 @@ export function MarkerPopup({ location, onEdit, onDelete }: MarkerPopupProps) {
 
   useEffect(() => {
     getAverageRating(location.id).then(setAvgRating).catch(() => {});
-  }, [location.id]);
+    getLocationVoteCounts(location.id).then(setVoteCounts).catch(() => {});
+    if (user?.username) {
+      getUserVote(location.id, user.username).then(setUserVote).catch(() => {});
+    }
+  }, [location.id, user?.username]);
+
+  const handleVote = async (voteType: 'up' | 'down') => {
+    if (!user?.username || isVoting) return;
+    setIsVoting(true);
+    try {
+      if (userVote === voteType) {
+        await removeVote(location.id, user.username);
+        setUserVote(null);
+      } else {
+        await voteLocation(location.id, user.username, voteType);
+        setUserVote(voteType);
+      }
+      const counts = await getLocationVoteCounts(location.id);
+      setVoteCounts(counts);
+    } catch {
+      // silent
+    } finally {
+      setIsVoting(false);
+    }
+  };
 
   const handleEdit = () => {
     setSelectedLocation(location);
@@ -63,7 +93,6 @@ export function MarkerPopup({ location, onEdit, onDelete }: MarkerPopupProps) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Fallback
       const textarea = document.createElement('textarea');
       textarea.value = shareUrl;
       document.body.appendChild(textarea);
@@ -125,6 +154,40 @@ export function MarkerPopup({ location, onEdit, onDelete }: MarkerPopupProps) {
           </div>
         )}
 
+        {/* Vote buttons */}
+        {user && (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => handleVote('up')}
+              disabled={isVoting}
+              className={`flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg transition-colors ${
+                userVote === 'up'
+                  ? 'bg-green-100 text-green-700 ring-1 ring-green-400'
+                  : 'bg-gray-100 text-gray-600 hover:bg-green-50 hover:text-green-600'
+              }`}
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+              </svg>
+              {voteCounts.up}
+            </button>
+            <button
+              onClick={() => handleVote('down')}
+              disabled={isVoting}
+              className={`flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-lg transition-colors ${
+                userVote === 'down'
+                  ? 'bg-red-100 text-red-700 ring-1 ring-red-400'
+                  : 'bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-600'
+              }`}
+            >
+              <svg className="w-3.5 h-3.5 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+              </svg>
+              {voteCounts.down}
+            </button>
+          </div>
+        )}
+
         {shortDescription && (
           <p className="text-sm text-gray-600 leading-relaxed">
             {shortDescription}
@@ -149,7 +212,6 @@ export function MarkerPopup({ location, onEdit, onDelete }: MarkerPopupProps) {
 
         {/* Actions */}
         <div className="flex items-center gap-1.5 pt-2 border-t border-gray-100 flex-wrap">
-          {/* Comments button */}
           <button
             onClick={() => setShowComments(true)}
             className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-lg hover:bg-blue-100 transition-colors"
@@ -160,7 +222,6 @@ export function MarkerPopup({ location, onEdit, onDelete }: MarkerPopupProps) {
             {avgRating.count > 0 ? avgRating.count : ''}
           </button>
 
-          {/* Deliberation button */}
           <button
             onClick={() => setShowDeliberation(true)}
             className="flex items-center gap-1 px-2.5 py-1.5 bg-purple-50 text-purple-700 text-xs font-medium rounded-lg hover:bg-purple-100 transition-colors"
@@ -171,7 +232,6 @@ export function MarkerPopup({ location, onEdit, onDelete }: MarkerPopupProps) {
             </svg>
           </button>
 
-          {/* Share button */}
           <button
             onClick={handleShare}
             className="flex items-center gap-1 px-3 py-2 bg-gray-50 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors"

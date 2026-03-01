@@ -12,6 +12,8 @@ export interface Location {
   created_at: string;
   updated_at: string;
   is_active: boolean;
+  votes_up: number;
+  votes_down: number;
 }
 
 // Comment/rating type
@@ -21,6 +23,17 @@ export interface LocationComment {
   username: string;
   comment: string | null;
   rating: number;
+  image_storage_path: string | null;
+  image_file_name: string | null;
+  created_at: string;
+}
+
+// Location vote type
+export interface LocationVote {
+  id: string;
+  location_id: string;
+  username: string;
+  vote_type: 'up' | 'down';
   created_at: string;
 }
 

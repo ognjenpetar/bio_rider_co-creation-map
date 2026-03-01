@@ -56,6 +56,8 @@ export interface Database {
           created_at: string;
           updated_at: string;
           is_active: boolean;
+          votes_up: number;
+          votes_down: number;
         };
         Insert: {
           id?: string;
@@ -70,6 +72,8 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
           is_active?: boolean;
+          votes_up?: number;
+          votes_down?: number;
         };
         Update: {
           id?: string;
@@ -84,6 +88,8 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
           is_active?: boolean;
+          votes_up?: number;
+          votes_down?: number;
         };
         Relationships: [];
       };
@@ -94,6 +100,8 @@ export interface Database {
           username: string;
           comment: string | null;
           rating: number;
+          image_storage_path: string | null;
+          image_file_name: string | null;
           created_at: string;
         };
         Insert: {
@@ -102,6 +110,8 @@ export interface Database {
           username: string;
           comment?: string | null;
           rating: number;
+          image_storage_path?: string | null;
+          image_file_name?: string | null;
           created_at?: string;
         };
         Update: {
@@ -110,6 +120,32 @@ export interface Database {
           username?: string;
           comment?: string | null;
           rating?: number;
+          image_storage_path?: string | null;
+          image_file_name?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      location_votes: {
+        Row: {
+          id: string;
+          location_id: string;
+          username: string;
+          vote_type: 'up' | 'down';
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          location_id: string;
+          username: string;
+          vote_type: 'up' | 'down';
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          location_id?: string;
+          username?: string;
+          vote_type?: 'up' | 'down';
           created_at?: string;
         };
         Relationships: [];

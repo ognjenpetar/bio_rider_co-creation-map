@@ -111,7 +111,14 @@
     "submit": "Submit",
     "noComments": "No comments yet. Be the first!",
     "deleteComment": "Delete",
-    "back": "Back"
+    "back": "Back",
+    "addImage": "Add Image",
+    "removeImage": "Remove"
+  },
+  "votes": {
+    "upvote": "Upvote",
+    "downvote": "Downvote",
+    "popular": "Popular"
   },
   "share": {
     "copyLink": "Copy Link",

@@ -1,9 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
-import { getComments, addComment, deleteComment } from '../../lib/api/comments';
+import { getComments, addComment, deleteComment, getCommentImageUrl } from '../../lib/api/comments';
 import { StarRating } from './StarRating';
 import type { LocationComment } from '../../types';
+
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
 
 interface LocationCommentsProps {
   locationId: string;
@@ -18,6 +20,9 @@ export function LocationComments({ locationId, onClose }: LocationCommentsProps)
   const [newComment, setNewComment] = useState('');
   const [newRating, setNewRating] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchComments = useCallback(async () => {
     try {
@@ -35,6 +40,24 @@ export function LocationComments({ locationId, onClose }: LocationCommentsProps)
     fetchComments();
   }, [fetchComments]);
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > MAX_IMAGE_SIZE) return;
+    if (!file.type.startsWith('image/')) return;
+
+    setSelectedImage(file);
+    const reader = new FileReader();
+    reader.onload = () => setImagePreview(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  const clearImage = () => {
+    setSelectedImage(null);
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || newRating === 0) return;
@@ -46,9 +69,11 @@ export function LocationComments({ locationId, onClose }: LocationCommentsProps)
         username: user.username,
         comment: newComment || undefined,
         rating: newRating,
+        image: selectedImage || undefined,
       });
       setNewComment('');
       setNewRating(0);
+      clearImage();
       await fetchComments();
     } catch {
       // silent fail
@@ -121,6 +146,21 @@ export function LocationComments({ locationId, onClose }: LocationCommentsProps)
               {comment.comment && (
                 <p className="text-sm text-gray-700">{comment.comment}</p>
               )}
+              {/* Comment image */}
+              {comment.image_storage_path && (
+                <a
+                  href={getCommentImageUrl(comment.image_storage_path)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block mt-2"
+                >
+                  <img
+                    src={getCommentImageUrl(comment.image_storage_path)}
+                    alt={comment.image_file_name || 'Comment image'}
+                    className="w-full max-h-40 object-cover rounded-lg border border-gray-200 hover:opacity-90 transition-opacity cursor-pointer"
+                  />
+                </a>
+              )}
             </div>
           ))
         )}
@@ -133,14 +173,58 @@ export function LocationComments({ locationId, onClose }: LocationCommentsProps)
             <span className="text-sm text-gray-600">{t('comments.yourRating')}:</span>
             <StarRating rating={newRating} onRate={setNewRating} size="md" />
           </div>
+
+          {/* Image preview */}
+          {imagePreview && (
+            <div className="relative mb-2 inline-block">
+              <img
+                src={imagePreview}
+                alt="Preview"
+                className="h-20 w-20 object-cover rounded-lg border border-gray-200"
+              />
+              <button
+                type="button"
+                onClick={clearImage}
+                className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600"
+              >
+                &times;
+              </button>
+            </div>
+          )}
+
           <div className="flex gap-2">
             <input
               type="text"
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              placeholder={t('comments.placeholder')}
+              placeholder={t('comments.commentPlaceholder')}
               className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
             />
+
+            {/* Image upload button */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageSelect}
+              className="hidden"
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className={`px-2.5 py-2 text-sm rounded-lg border transition-colors ${
+                selectedImage
+                  ? 'bg-blue-50 border-blue-300 text-blue-600'
+                  : 'border-gray-300 text-gray-500 hover:bg-gray-50'
+              }`}
+              title={t('comments.addImage')}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </button>
+
             <button
               type="submit"
               disabled={isSubmitting || newRating === 0}
