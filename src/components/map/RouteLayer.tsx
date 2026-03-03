@@ -7,6 +7,7 @@ import L from 'leaflet';
 
 interface RouteLayerProps {
   visible: boolean;
+  refreshTrigger?: number;
 }
 
 const routeTypeIcons: Record<string, string> = {
@@ -16,15 +17,15 @@ const routeTypeIcons: Record<string, string> = {
   other: '&#128205;',
 };
 
-export function RouteLayer({ visible }: RouteLayerProps) {
+export function RouteLayer({ visible, refreshTrigger }: RouteLayerProps) {
   const { t } = useTranslation();
   const [routes, setRoutes] = useState<Route[]>([]);
 
   useEffect(() => {
     if (visible) {
-      getRoutes().then(setRoutes).catch(() => {});
+      getRoutes().then(setRoutes).catch(console.error);
     }
-  }, [visible]);
+  }, [visible, refreshTrigger]);
 
   if (!visible || routes.length === 0) return null;
 

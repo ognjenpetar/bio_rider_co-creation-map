@@ -58,10 +58,10 @@ export function MapPage() {
   const [showLocationsList, setShowLocationsList] = useState(false);
   const [showExportMenu, setShowExportMenu] = useState(false);
 
-  // Layer states
+  // Layer states — default routes & zones to ON so saved data is always visible
   const [showHeatmap, setShowHeatmap] = useState(false);
-  const [showRoutes, setShowRoutes] = useState(false);
-  const [showZones, setShowZones] = useState(false);
+  const [showRoutes, setShowRoutes] = useState(true);
+  const [showZones, setShowZones] = useState(true);
   const [showTimeMachine, setShowTimeMachine] = useState(false);
   const [filteredLocations, setFilteredLocations] = useState<Location[] | null>(null);
   const [showLayersMenu, setShowLayersMenu] = useState(false);
@@ -82,6 +82,7 @@ export function MapPage() {
   const [zoneType, setZoneType] = useState<ZoneType>('other');
   const [zoneSaving, setZoneSaving] = useState(false);
   const [zoneRefresh, setZoneRefresh] = useState(0);
+  const [routeRefresh, setRouteRefresh] = useState(0);
 
   // Handle shared location link (?location=ID)
   useEffect(() => {
@@ -170,8 +171,10 @@ export function MapPage() {
       handleCancelRoute();
       setRouteName('');
       setShowRoutes(true);
-    } catch {
-      // ignore
+      setRouteRefresh(prev => prev + 1);
+    } catch (err) {
+      console.error('Failed to save route:', err);
+      alert(t('routes.saveError', 'Failed to save route. Check console for details.'));
     } finally {
       setRouteSaving(false);
     }
@@ -207,8 +210,9 @@ export function MapPage() {
       setZoneType('other');
       setShowZones(true);
       setZoneRefresh(prev => prev + 1);
-    } catch {
-      // ignore
+    } catch (err) {
+      console.error('Failed to save zone:', err);
+      alert(t('zones.saveError', 'Failed to save zone. Check console for details.'));
     } finally {
       setZoneSaving(false);
     }
@@ -564,7 +568,7 @@ export function MapPage() {
           <div className={`flex-1 relative ${showForm || showLocationsList ? 'hidden md:block' : ''}`}>
             <MapContainer className="h-full">
               <HeatmapLayer locations={displayedLocations} visible={showHeatmap} />
-              <RouteLayer visible={showRoutes} />
+              <RouteLayer visible={showRoutes} refreshTrigger={routeRefresh} />
               <ZoneLayer visible={showZones} refreshTrigger={zoneRefresh} />
               <RouteCreatorLayer
                 active={isCreatingRoute}
