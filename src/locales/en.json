@@ -258,6 +258,13 @@
     "skip": "Skip Tour",
     "finish": "Let's Go!"
   },
+  "list": {
+    "all": "All",
+    "points": "Points",
+    "routes": "Routes",
+    "zones": "Zones",
+    "items": "items"
+  },
   "common": {
     "loading": "Loading...",
     "error": "An error occurred",

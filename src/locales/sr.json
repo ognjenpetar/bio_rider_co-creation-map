@@ -258,6 +258,13 @@
     "skip": "Preskoci Turu",
     "finish": "Krenimo!"
   },
+  "list": {
+    "all": "Sve",
+    "points": "Tacke",
+    "routes": "Rute",
+    "zones": "Zone",
+    "items": "stavki"
+  },
   "common": {
     "loading": "Ucitavanje...",
     "error": "Doslo je do greske",
