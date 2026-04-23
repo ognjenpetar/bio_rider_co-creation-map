@@ -13,13 +13,14 @@ import { voteRoute, removeRouteVote, getUserRouteVote, getRouteVoteCounts } from
 import { getZoneComments, addZoneComment, deleteZoneComment } from '../../lib/api/zoneComments';
 import { voteZone, removeZoneVote, getUserZoneVote, getZoneVoteCounts } from '../../lib/api/zoneVotes';
 
-import { deleteLocation, updateLocation } from '../../lib/api/locations';
+import { deleteLocation, updateLocation, uploadLocationImages, uploadLocationDocuments, getLocationImages, getLocationDocuments, deleteLocationImage, deleteLocationDocument } from '../../lib/api/locations';
 import { deleteRoute, updateRoute } from '../../lib/api/routes';
 import { deleteZone, updateZone } from '../../lib/api/zones';
+import { getStorageUrl, STORAGE_BUCKETS } from '../../lib/supabase';
 
 import { StarRating } from './StarRating';
 import { DeliberationPanel } from './DeliberationPanel';
-import type { Location, Route, Zone } from '../../types';
+import type { Location, Route, Zone, LocationImage, LocationDocument } from '../../types';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -105,6 +106,14 @@ export function EntityDetailModal({ entity, onClose, onDeleted, onUpdated }: Ent
   const [editTimeMin, setEditTimeMin] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
+  // Images & documents (locations only)
+  const [locImages, setLocImages] = useState<LocationImage[]>([]);
+  const [locDocuments, setLocDocuments] = useState<LocationDocument[]>([]);
+  const [newImages, setNewImages] = useState<File[]>([]);
+  const [newDocuments, setNewDocuments] = useState<File[]>([]);
+  const imgInputRef = useRef<HTMLInputElement>(null);
+  const docInputRef = useRef<HTMLInputElement>(null);
+
   const entityId = entity.data.id;
   const entityType = entity.type;
 
@@ -112,6 +121,8 @@ export function EntityDetailModal({ entity, onClose, onDeleted, onUpdated }: Ent
   useEffect(() => {
     setActiveTab('info');
     setIsEditing(false);
+    setNewImages([]);
+    setNewDocuments([]);
   }, [entityId]);
 
   // ── Load votes & comments ───────────────────────────────────────────────────
@@ -149,10 +160,20 @@ export function EntityDetailModal({ entity, onClose, onDeleted, onUpdated }: Ent
     }
   }, [entityId, entityType]);
 
+  const loadMedia = useCallback(async () => {
+    if (entityType !== 'location') return;
+    try {
+      const [imgs, docs] = await Promise.all([getLocationImages(entityId), getLocationDocuments(entityId)]);
+      setLocImages(imgs);
+      setLocDocuments(docs);
+    } catch { /* silent */ }
+  }, [entityId, entityType]);
+
   useEffect(() => {
     loadVotes();
     loadComments();
-  }, [loadVotes, loadComments]);
+    loadMedia();
+  }, [loadVotes, loadComments, loadMedia]);
 
   // ── Vote handler ────────────────────────────────────────────────────────────
 
@@ -258,6 +279,16 @@ export function EntityDetailModal({ entity, onClose, onDeleted, onUpdated }: Ent
           description_en: editDescEn || undefined,
           description_sr: editDescSr || undefined,
         });
+        if (newImages.length > 0) {
+          const firstPath = await uploadLocationImages(entityId, newImages);
+          if (firstPath && !entity.data.preview_image_url) {
+            await updateLocation(entityId, { preview_image_url: getStorageUrl(STORAGE_BUCKETS.IMAGES, firstPath) });
+          }
+        }
+        if (newDocuments.length > 0) await uploadLocationDocuments(entityId, newDocuments);
+        setNewImages([]);
+        setNewDocuments([]);
+        await loadMedia();
       } else if (entityType === 'route') {
         await updateRoute(entityId, {
           name: editName.trim(),
@@ -466,6 +497,94 @@ export function EntityDetailModal({ entity, onClose, onDeleted, onUpdated }: Ent
                             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 outline-none resize-none"
                           />
                         </div>
+
+                        {/* Existing images */}
+                        {locImages.length > 0 && (
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">Postojeće fotografije</label>
+                            <div className="flex flex-wrap gap-2">
+                              {locImages.map(img => (
+                                <div key={img.id} className="relative group">
+                                  <img
+                                    src={getStorageUrl(STORAGE_BUCKETS.IMAGES, img.storage_path)}
+                                    alt={img.file_name}
+                                    className="w-16 h-16 object-cover rounded-lg border border-gray-200"
+                                  />
+                                  {canEdit && (
+                                    <button
+                                      type="button"
+                                      onClick={async () => { await deleteLocationImage(img.id, img.storage_path); await loadMedia(); }}
+                                      className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >×</button>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Add new images */}
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">Dodaj fotografije</label>
+                          <input ref={imgInputRef} type="file" accept="image/*" multiple className="hidden"
+                            onChange={e => setNewImages(prev => [...prev, ...Array.from(e.target.files || [])])} />
+                          <button type="button" onClick={() => imgInputRef.current?.click()}
+                            className="w-full border-2 border-dashed border-gray-300 rounded-xl py-3 text-sm text-gray-500 hover:border-green-400 hover:text-green-600 transition-colors">
+                            📷 Klikni za odabir fotografija
+                          </button>
+                          {newImages.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-2">
+                              {newImages.map((f, i) => (
+                                <div key={i} className="relative group">
+                                  <img src={URL.createObjectURL(f)} alt="" className="w-16 h-16 object-cover rounded-lg border border-green-200" />
+                                  <button type="button" onClick={() => setNewImages(prev => prev.filter((_, j) => j !== i))}
+                                    className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">×</button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Existing documents */}
+                        {locDocuments.length > 0 && (
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1">Postojeći dokumenti</label>
+                            <div className="space-y-1.5">
+                              {locDocuments.map(doc => (
+                                <div key={doc.id} className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2 text-sm">
+                                  <a href={getStorageUrl(STORAGE_BUCKETS.DOCUMENTS, doc.storage_path)} target="_blank" rel="noopener noreferrer"
+                                    className="text-blue-600 hover:underline truncate flex-1">📄 {doc.file_name}</a>
+                                  {canEdit && (
+                                    <button type="button" onClick={async () => { await deleteLocationDocument(doc.id, doc.storage_path); await loadMedia(); }}
+                                      className="ml-2 text-red-400 hover:text-red-600 text-xs flex-shrink-0">Obriši</button>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Add new documents */}
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">Dodaj dokumente</label>
+                          <input ref={docInputRef} type="file" accept=".pdf,.doc,.docx" multiple className="hidden"
+                            onChange={e => setNewDocuments(prev => [...prev, ...Array.from(e.target.files || [])])} />
+                          <button type="button" onClick={() => docInputRef.current?.click()}
+                            className="w-full border-2 border-dashed border-gray-300 rounded-xl py-3 text-sm text-gray-500 hover:border-green-400 hover:text-green-600 transition-colors">
+                            📄 Klikni za odabir dokumenata (PDF, DOC)
+                          </button>
+                          {newDocuments.length > 0 && (
+                            <div className="space-y-1.5 mt-2">
+                              {newDocuments.map((f, i) => (
+                                <div key={i} className="flex items-center justify-between bg-green-50 rounded-lg px-3 py-2 text-sm">
+                                  <span className="truncate text-gray-700">📄 {f.name}</span>
+                                  <button type="button" onClick={() => setNewDocuments(prev => prev.filter((_, j) => j !== i))}
+                                    className="ml-2 text-red-400 hover:text-red-600 text-xs flex-shrink-0">×</button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       </>
                     ) : (
                       <div>
@@ -614,6 +733,39 @@ export function EntityDetailModal({ entity, onClose, onDeleted, onUpdated }: Ent
                     {entityType === 'zone' && (
                       <div className="bg-purple-50 rounded-xl px-4 py-3 text-sm text-purple-800 font-medium">
                         {ZONE_TYPE_LABELS[entity.data.zone_type] ?? entity.data.zone_type}
+                      </div>
+                    )}
+
+                    {/* Image gallery (locations) */}
+                    {entityType === 'location' && locImages.length > 0 && (
+                      <div>
+                        <p className="text-xs font-medium text-gray-500 mb-2">📷 Fotografije ({locImages.length})</p>
+                        <div className="grid grid-cols-3 gap-2">
+                          {locImages.map(img => (
+                            <a key={img.id} href={getStorageUrl(STORAGE_BUCKETS.IMAGES, img.storage_path)} target="_blank" rel="noopener noreferrer">
+                              <img
+                                src={getStorageUrl(STORAGE_BUCKETS.IMAGES, img.storage_path)}
+                                alt={img.file_name}
+                                className="w-full h-20 object-cover rounded-lg border border-gray-200 hover:opacity-90 transition-opacity"
+                              />
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Documents (locations) */}
+                    {entityType === 'location' && locDocuments.length > 0 && (
+                      <div>
+                        <p className="text-xs font-medium text-gray-500 mb-2">📄 Dokumenti ({locDocuments.length})</p>
+                        <div className="space-y-1.5">
+                          {locDocuments.map(doc => (
+                            <a key={doc.id} href={getStorageUrl(STORAGE_BUCKETS.DOCUMENTS, doc.storage_path)} target="_blank" rel="noopener noreferrer"
+                              className="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 rounded-lg px-3 py-2 text-sm text-blue-600 hover:underline transition-colors">
+                              📄 {doc.file_name}
+                            </a>
+                          ))}
+                        </div>
                       </div>
                     )}
 
