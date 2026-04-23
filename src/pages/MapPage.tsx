@@ -17,9 +17,10 @@ import { useAuth } from '../contexts/AuthContext';
 import { useMap } from '../contexts/MapContext';
 import { useLocations } from '../hooks/useLocations';
 import { useSearch } from '../hooks/useSearch';
-import { exportAsCSV, exportAsGeoJSON } from '../lib/export';
-import { createRoute } from '../lib/api/routes';
-import { createZone } from '../lib/api/zones';
+import { exportAsCSV, exportAllAsGeoJSON, exportAsPDF } from '../lib/export';
+import { createRoute, getRoutes } from '../lib/api/routes';
+import { createZone, getZones } from '../lib/api/zones';
+import { EntityDetailModal, type SelectedEntity } from '../components/map/EntityDetailModal';
 import type { Location, LocationFormData, Coordinates, ZoneType } from '../types';
 
 // Haversine formula for route distance calculation
@@ -71,7 +72,7 @@ export function MapPage() {
   const [routeWaypoints, setRouteWaypoints] = useState<Coordinates[]>([]);
   const [showRouteSaveForm, setShowRouteSaveForm] = useState(false);
   const [routeName, setRouteName] = useState('');
-  const [routeType, setRouteType] = useState<'cycling' | 'walking' | 'hiking' | 'other'>('cycling');
+  const [routeType, setRouteType] = useState<'cycling' | 'walking' | 'hiking' | 'biotop' | 'other'>('cycling');
   const [routeSaving, setRouteSaving] = useState(false);
 
   // Zone creation state
@@ -83,6 +84,12 @@ export function MapPage() {
   const [zoneSaving, setZoneSaving] = useState(false);
   const [zoneRefresh, setZoneRefresh] = useState(0);
   const [routeRefresh, setRouteRefresh] = useState(0);
+  const [isExportingGeoJSON, setIsExportingGeoJSON] = useState(false);
+  const [isExportingPDF, setIsExportingPDF] = useState(false);
+  const [baseMap, setBaseMap] = useState<'osm' | 'satellite'>('osm');
+
+  // Entity detail modal
+  const [selectedEntity, setSelectedEntity] = useState<SelectedEntity | null>(null);
 
   // Handle shared location link (?location=ID)
   useEffect(() => {
@@ -132,12 +139,39 @@ export function MapPage() {
     }
   }, [pendingCoordinates, showForm, isEditMode]);
 
-  useEffect(() => {
-    if (selectedLocation && !showForm) {
-      setIsEditMode(true);
-      setShowForm(true);
+  // Removed: auto-open form on selectLocation — modal handles details now
+  // Form only opens when edit is explicitly requested from modal
+
+  const openEntityDetail = (entity: SelectedEntity) => {
+    setSelectedEntity(entity);
+  };
+
+  // Export handlers
+  const handleExportGeoJSON = async () => {
+    setIsExportingGeoJSON(true);
+    setShowExportMenu(false);
+    try {
+      const [routes, zones] = await Promise.all([getRoutes(), getZones()]);
+      exportAllAsGeoJSON(mapLocations, routes, zones);
+    } catch (err) {
+      console.error('GeoJSON export failed:', err);
+    } finally {
+      setIsExportingGeoJSON(false);
     }
-  }, [selectedLocation, showForm]);
+  };
+
+  const handleExportPDF = async () => {
+    setIsExportingPDF(true);
+    setShowExportMenu(false);
+    try {
+      const [routes, zones] = await Promise.all([getRoutes(), getZones()]);
+      exportAsPDF(mapLocations, routes, zones);
+    } catch (err) {
+      console.error('PDF export failed:', err);
+    } finally {
+      setIsExportingPDF(false);
+    }
+  };
 
   // Route creation handlers
   const handleStartRouteCreation = () => {
@@ -228,8 +262,8 @@ export function MapPage() {
       <OnboardingTour />
 
       <main className="flex-1 flex flex-col overflow-hidden">
-        {/* Toolbar */}
-        <div className="bg-white border-b border-gray-200 px-4 py-3">
+        {/* Toolbar — z-[1000] ensures dropdown appears above Leaflet layers (max z-index ~800) */}
+        <div className="relative z-[1000] bg-white border-b border-gray-200 px-4 py-3">
           <div className="max-w-7xl mx-auto flex items-center gap-2 sm:gap-3 flex-wrap">
 
             {/* Search */}
@@ -385,6 +419,27 @@ export function MapPage() {
               </AnimatePresence>
             </div>
 
+            {/* Base map toggle */}
+            <button
+              onClick={() => setBaseMap(m => m === 'osm' ? 'satellite' : 'osm')}
+              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                baseMap === 'satellite' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+              title={baseMap === 'osm' ? 'Prebaci na Satelitsku podlogu' : 'Prebaci na OpenStreetMap'}
+            >
+              {baseMap === 'osm' ? (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" strokeWidth={2} />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              )}
+              <span className="hidden sm:inline">{baseMap === 'osm' ? 'Satelit' : 'OSM'}</span>
+            </button>
+
             {/* Export */}
             <div className="relative" data-tour="export">
               <button
@@ -397,18 +452,35 @@ export function MapPage() {
                 <span className="hidden sm:inline">{t('export.title')}</span>
               </button>
               {showExportMenu && (
-                <div className="absolute right-0 mt-1 bg-white rounded-lg shadow-lg border border-gray-200 z-50 min-w-[160px]">
+                <div className="absolute right-0 mt-1 bg-white rounded-xl shadow-xl border border-gray-200 min-w-[180px] overflow-hidden">
                   <button
                     onClick={() => { exportAsCSV(mapLocations); setShowExportMenu(false); }}
-                    className="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-50 rounded-t-lg"
+                    className="w-full px-4 py-2.5 text-sm text-left text-gray-700 hover:bg-gray-50 flex items-center gap-2.5"
                   >
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
                     CSV (.csv)
                   </button>
                   <button
-                    onClick={() => { exportAsGeoJSON(mapLocations); setShowExportMenu(false); }}
-                    className="w-full px-4 py-2 text-sm text-left text-gray-700 hover:bg-gray-50 rounded-b-lg border-t border-gray-100"
+                    onClick={handleExportGeoJSON}
+                    disabled={isExportingGeoJSON}
+                    className="w-full px-4 py-2.5 text-sm text-left text-gray-700 hover:bg-gray-50 border-t border-gray-100 flex items-center gap-2.5 disabled:opacity-60"
                   >
-                    GeoJSON (.geojson)
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064" />
+                    </svg>
+                    {isExportingGeoJSON ? t('export.exporting') : 'GeoJSON (.geojson)'}
+                  </button>
+                  <button
+                    onClick={handleExportPDF}
+                    disabled={isExportingPDF}
+                    className="w-full px-4 py-2.5 text-sm text-left text-gray-700 hover:bg-gray-50 border-t border-gray-100 flex items-center gap-2.5 disabled:opacity-60"
+                  >
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                    {isExportingPDF ? t('export.exporting') : 'PDF (.pdf)'}
                   </button>
                 </div>
               )}
@@ -566,10 +638,22 @@ export function MapPage() {
 
           {/* Map section */}
           <div className={`flex-1 relative ${showForm || showLocationsList ? 'hidden md:block' : ''}`}>
-            <MapContainer className="h-full">
+            <MapContainer
+              className="h-full"
+              onLocationOpenDetail={loc => openEntityDetail({ type: 'location', data: loc })}
+              baseMap={baseMap}
+            >
               <HeatmapLayer locations={displayedLocations} visible={showHeatmap} />
-              <RouteLayer visible={showRoutes} refreshTrigger={routeRefresh} />
-              <ZoneLayer visible={showZones} refreshTrigger={zoneRefresh} />
+              <RouteLayer
+                visible={showRoutes}
+                refreshTrigger={routeRefresh}
+                onSelect={route => openEntityDetail({ type: 'route', data: route })}
+              />
+              <ZoneLayer
+                visible={showZones}
+                refreshTrigger={zoneRefresh}
+                onSelect={zone => openEntityDetail({ type: 'zone', data: zone })}
+              />
               <RouteCreatorLayer
                 active={isCreatingRoute}
                 waypoints={routeWaypoints}
@@ -698,6 +782,7 @@ export function MapPage() {
                 <option value="cycling">🚲 {t('routes.cycling')}</option>
                 <option value="walking">🚶 {t('routes.walking')}</option>
                 <option value="hiking">🥾 {t('routes.hiking')}</option>
+                <option value="biotop">🌿 {t('routes.biotop')}</option>
                 <option value="other">📍 {t('routes.other')}</option>
               </select>
 
@@ -761,6 +846,7 @@ export function MapPage() {
                 <option value="restricted">⚠️ {t('zones.types.restricted')}</option>
                 <option value="residential">🏠 {t('zones.types.residential')}</option>
                 <option value="commercial">🏪 {t('zones.types.commercial')}</option>
+                <option value="biotop">🌿 {t('zones.types.biotop')}</option>
                 <option value="other">📍 {t('zones.types.other')}</option>
               </select>
 
@@ -781,6 +867,25 @@ export function MapPage() {
               </div>
             </motion.div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Entity detail modal — location / route / zone */}
+      <AnimatePresence>
+        {selectedEntity && (
+          <EntityDetailModal
+            entity={selectedEntity}
+            onClose={() => setSelectedEntity(null)}
+            onDeleted={() => {
+              setSelectedEntity(null);
+              if (selectedEntity.type === 'route') setRouteRefresh(n => n + 1);
+              if (selectedEntity.type === 'zone') setZoneRefresh(n => n + 1);
+            }}
+            onUpdated={() => {
+              if (selectedEntity.type === 'route') setRouteRefresh(n => n + 1);
+              if (selectedEntity.type === 'zone') setZoneRefresh(n => n + 1);
+            }}
+          />
         )}
       </AnimatePresence>
     </div>

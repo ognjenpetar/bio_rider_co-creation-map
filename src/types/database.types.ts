@@ -265,8 +265,10 @@ export interface Database {
           created_by: string;
           distance_km: number | null;
           estimated_time_min: number | null;
-          route_type: 'cycling' | 'walking' | 'hiking' | 'other';
+          route_type: 'cycling' | 'walking' | 'hiking' | 'biotop' | 'other';
           is_active: boolean;
+          votes_up: number;
+          votes_down: number;
           created_at: string;
           updated_at: string;
         };
@@ -279,7 +281,9 @@ export interface Database {
           created_by: string;
           distance_km?: number | null;
           estimated_time_min?: number | null;
-          route_type?: 'cycling' | 'walking' | 'hiking' | 'other';
+          route_type?: 'cycling' | 'walking' | 'hiking' | 'biotop' | 'other';
+          votes_up?: number;
+          votes_down?: number;
           is_active?: boolean;
           created_at?: string;
           updated_at?: string;
@@ -293,7 +297,9 @@ export interface Database {
           created_by?: string;
           distance_km?: number | null;
           estimated_time_min?: number | null;
-          route_type?: 'cycling' | 'walking' | 'hiking' | 'other';
+          route_type?: 'cycling' | 'walking' | 'hiking' | 'biotop' | 'other';
+          votes_up?: number;
+          votes_down?: number;
           is_active?: boolean;
           created_at?: string;
           updated_at?: string;
@@ -435,8 +441,10 @@ export interface Database {
           color: string;
           fill_color: string;
           created_by: string;
-          zone_type: 'park' | 'cycling' | 'restricted' | 'residential' | 'commercial' | 'other';
+          zone_type: 'park' | 'cycling' | 'restricted' | 'residential' | 'commercial' | 'biotop' | 'other';
           is_active: boolean;
+          votes_up: number;
+          votes_down: number;
           created_at: string;
           updated_at: string;
         };
@@ -448,7 +456,9 @@ export interface Database {
           color?: string;
           fill_color?: string;
           created_by: string;
-          zone_type?: 'park' | 'cycling' | 'restricted' | 'residential' | 'commercial' | 'other';
+          zone_type?: 'park' | 'cycling' | 'restricted' | 'residential' | 'commercial' | 'biotop' | 'other';
+          votes_up?: number;
+          votes_down?: number;
           is_active?: boolean;
           created_at?: string;
           updated_at?: string;
@@ -461,7 +471,9 @@ export interface Database {
           color?: string;
           fill_color?: string;
           created_by?: string;
-          zone_type?: 'park' | 'cycling' | 'restricted' | 'residential' | 'commercial' | 'other';
+          zone_type?: 'park' | 'cycling' | 'restricted' | 'residential' | 'commercial' | 'biotop' | 'other';
+          votes_up?: number;
+          votes_down?: number;
           is_active?: boolean;
           created_at?: string;
           updated_at?: string;
@@ -505,6 +517,36 @@ export interface Database {
           created_at?: string;
           reviewed_at?: string | null;
         };
+        Relationships: [];
+      };
+      route_votes: {
+        Row: { id: string; route_id: string; username: string; vote_type: 'up' | 'down'; created_at: string; };
+        Insert: { id?: string; route_id: string; username: string; vote_type: 'up' | 'down'; created_at?: string; };
+        Update: { id?: string; route_id?: string; username?: string; vote_type?: 'up' | 'down'; created_at?: string; };
+        Relationships: [];
+      };
+      route_comments: {
+        Row: { id: string; route_id: string; username: string; comment: string | null; rating: number; created_at: string; };
+        Insert: { id?: string; route_id: string; username: string; comment?: string | null; rating: number; created_at?: string; };
+        Update: { id?: string; route_id?: string; username?: string; comment?: string | null; rating?: number; created_at?: string; };
+        Relationships: [];
+      };
+      zone_votes: {
+        Row: { id: string; zone_id: string; username: string; vote_type: 'up' | 'down'; created_at: string; };
+        Insert: { id?: string; zone_id: string; username: string; vote_type: 'up' | 'down'; created_at?: string; };
+        Update: { id?: string; zone_id?: string; username?: string; vote_type?: 'up' | 'down'; created_at?: string; };
+        Relationships: [];
+      };
+      zone_comments: {
+        Row: { id: string; zone_id: string; username: string; comment: string | null; rating: number; created_at: string; };
+        Insert: { id?: string; zone_id: string; username: string; comment?: string | null; rating: number; created_at?: string; };
+        Update: { id?: string; zone_id?: string; username?: string; comment?: string | null; rating?: number; created_at?: string; };
+        Relationships: [];
+      };
+      user_bans: {
+        Row: { id: string; username: string; ban_type: 'permanent' | 'temporary'; ban_until: string | null; reason: string | null; banned_by: string; created_at: string; };
+        Insert: { id?: string; username: string; ban_type: 'permanent' | 'temporary'; ban_until?: string | null; reason?: string | null; banned_by?: string; created_at?: string; };
+        Update: { id?: string; username?: string; ban_type?: 'permanent' | 'temporary'; ban_until?: string | null; reason?: string | null; banned_by?: string; created_at?: string; };
         Relationships: [];
       };
     };

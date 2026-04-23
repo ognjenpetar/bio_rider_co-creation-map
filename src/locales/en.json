@@ -127,7 +127,8 @@
   "export": {
     "title": "Export",
     "csv": "Export CSV",
-    "geojson": "Export GeoJSON"
+    "geojson": "Export GeoJSON",
+    "exporting": "Exporting..."
   },
   "stats": {
     "title": "Statistics",
@@ -163,6 +164,7 @@
       "restricted": "Restricted Area",
       "residential": "Residential",
       "commercial": "Commercial",
+      "biotop": "Biotop",
       "other": "Other"
     }
   },
@@ -175,6 +177,7 @@
     "cycling": "Cycling",
     "walking": "Walking",
     "hiking": "Hiking",
+    "biotop": "Biotop",
     "other": "Other",
     "distance": "Distance",
     "estimatedTime": "Est. Time",

@@ -3,8 +3,13 @@ import L from 'leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import { useMap } from '../../contexts/MapContext';
 import { LocationMarker } from './LocationMarker';
+import type { Location } from '../../types';
 
-export function LocationMarkers() {
+interface LocationMarkersProps {
+  onOpenDetail?: (location: Location) => void;
+}
+
+export function LocationMarkers({ onOpenDetail }: LocationMarkersProps) {
   const {
     locations,
     selectedLocation,
@@ -13,24 +18,14 @@ export function LocationMarkers() {
     hoveredLocationId,
   } = useMap();
 
-  // Filter locations based on search
   const visibleLocations = useMemo(() => {
-    if (!isSearchActive || !filteredLocationIds) {
-      return locations;
-    }
-    return locations.filter((loc) => filteredLocationIds.has(loc.id));
+    if (!isSearchActive || !filteredLocationIds) return locations;
+    return locations.filter(loc => filteredLocationIds.has(loc.id));
   }, [locations, filteredLocationIds, isSearchActive]);
 
-  // Dimmed locations (when search is active but location doesn't match)
   const dimmedLocationIds = useMemo(() => {
-    if (!isSearchActive || !filteredLocationIds) {
-      return new Set<string>();
-    }
-    return new Set(
-      locations
-        .filter((loc) => !filteredLocationIds.has(loc.id))
-        .map((loc) => loc.id)
-    );
+    if (!isSearchActive || !filteredLocationIds) return new Set<string>();
+    return new Set(locations.filter(loc => !filteredLocationIds.has(loc.id)).map(loc => loc.id));
   }, [locations, filteredLocationIds, isSearchActive]);
 
   return (
@@ -45,7 +40,6 @@ export function LocationMarkers() {
           let size = 'small';
           if (count >= 10) size = 'medium';
           if (count >= 30) size = 'large';
-
           return L.divIcon({
             html: `<div class="cluster-marker cluster-${size}"><span>${count}</span></div>`,
             className: 'custom-cluster-icon',
@@ -53,29 +47,29 @@ export function LocationMarkers() {
           });
         }}
       >
-        {/* Render visible markers */}
-        {visibleLocations.map((location) => (
+        {visibleLocations.map(location => (
           <LocationMarker
             key={location.id}
             location={location}
             isSelected={selectedLocation?.id === location.id}
             isHovered={hoveredLocationId === location.id}
             isDimmed={dimmedLocationIds.has(location.id)}
+            onOpenDetail={onOpenDetail}
           />
         ))}
       </MarkerClusterGroup>
 
-      {/* Render dimmed markers outside cluster when search is active */}
       {isSearchActive &&
         locations
-          .filter((loc) => dimmedLocationIds.has(loc.id))
-          .map((location) => (
+          .filter(loc => dimmedLocationIds.has(loc.id))
+          .map(location => (
             <LocationMarker
               key={location.id}
               location={location}
               isSelected={false}
               isHovered={false}
               isDimmed={true}
+              onOpenDetail={onOpenDetail}
             />
           ))}
     </>

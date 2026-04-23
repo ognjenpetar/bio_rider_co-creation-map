@@ -26,7 +26,7 @@ export async function createRoute(data: {
   waypoints: Array<{ lat: number; lng: number }>;
   color?: string;
   created_by: string;
-  route_type?: 'cycling' | 'walking' | 'hiking' | 'other';
+  route_type?: 'cycling' | 'walking' | 'hiking' | 'biotop' | 'other';
   distance_km?: number;
   estimated_time_min?: number;
 }): Promise<Route> {
@@ -50,6 +50,27 @@ export async function createRoute(data: {
     ...route,
     waypoints: data.waypoints,
   };
+}
+
+export async function updateRoute(id: string, data: {
+  name?: string;
+  description?: string;
+  route_type?: 'cycling' | 'walking' | 'hiking' | 'biotop' | 'other';
+  color?: string;
+  distance_km?: number | null;
+  estimated_time_min?: number | null;
+}): Promise<Route> {
+  const { data: route, error } = await supabase
+    .from('routes')
+    .update(data)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  const raw = route.waypoints;
+  const waypoints = Array.isArray(raw) ? raw : typeof raw === 'string' ? JSON.parse(raw) : [];
+  return { ...route, waypoints };
 }
 
 export async function deleteRoute(id: string): Promise<void> {

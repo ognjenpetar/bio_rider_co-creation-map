@@ -131,10 +131,21 @@ export interface Route {
   created_by: string;
   distance_km: number | null;
   estimated_time_min: number | null;
-  route_type: 'cycling' | 'walking' | 'hiking' | 'other';
+  route_type: 'cycling' | 'walking' | 'hiking' | 'biotop' | 'other';
   is_active: boolean;
+  votes_up: number;
+  votes_down: number;
   created_at: string;
   updated_at: string;
+}
+
+export interface RouteComment {
+  id: string;
+  route_id: string;
+  username: string;
+  comment: string | null;
+  rating: number;
+  created_at: string;
 }
 
 // Deliberation types
@@ -165,7 +176,7 @@ export interface DeliberationEntry {
 }
 
 // Zone type (polygon area)
-export type ZoneType = 'park' | 'cycling' | 'restricted' | 'residential' | 'commercial' | 'other';
+export type ZoneType = 'park' | 'cycling' | 'restricted' | 'residential' | 'commercial' | 'biotop' | 'other';
 
 export interface Zone {
   id: string;
@@ -177,8 +188,19 @@ export interface Zone {
   created_by: string;
   zone_type: ZoneType;
   is_active: boolean;
+  votes_up: number;
+  votes_down: number;
   created_at: string;
   updated_at: string;
+}
+
+export interface ZoneComment {
+  id: string;
+  zone_id: string;
+  username: string;
+  comment: string | null;
+  rating: number;
+  created_at: string;
 }
 
 // Notification type

@@ -1,9 +1,8 @@
 import { useMemo } from 'react';
-import { Marker, Popup, Tooltip } from 'react-leaflet';
+import { Marker, Tooltip } from 'react-leaflet';
 import L from 'leaflet';
 import { useMap } from '../../contexts/MapContext';
 import { createCustomIcon } from './customMarkerIcon';
-import { MarkerPopup } from './MarkerPopup';
 import type { Location } from '../../types';
 
 interface LocationMarkerProps {
@@ -11,6 +10,7 @@ interface LocationMarkerProps {
   isSelected: boolean;
   isHovered: boolean;
   isDimmed: boolean;
+  onOpenDetail?: (location: Location) => void;
 }
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
@@ -20,6 +20,7 @@ export function LocationMarker({
   isSelected,
   isHovered,
   isDimmed,
+  onOpenDetail,
 }: LocationMarkerProps) {
   const { selectLocation, setHoveredLocationId } = useMap();
 
@@ -28,7 +29,6 @@ export function LocationMarker({
     const creatorInitial = location.created_by?.charAt(0).toUpperCase() || '?';
     const opacity = isDimmed ? 0.4 : 1;
 
-    // Selected or hovered: use blue accent marker
     if (isSelected || isHovered) {
       const size = isSelected ? 44 : 40;
       const borderColor = isSelected ? '#0284c7' : '#0ea5e9';
@@ -58,7 +58,6 @@ export function LocationMarker({
       });
     }
 
-    // Dimmed: gray marker
     if (isDimmed) {
       return L.divIcon({
         html: `
@@ -84,10 +83,9 @@ export function LocationMarker({
       });
     }
 
-    // Normal: use custom icon with status (new/pulse, verified badge, gold for high-rated, popular)
     const isPopular = (location.votes_up ?? 0) - (location.votes_down ?? 0) >= 5;
     return createCustomIcon({ isNew, isPopular, creatorInitial });
-  }, [location.created_at, location.created_by, isSelected, isHovered, isDimmed]);
+  }, [location.created_at, location.created_by, location.votes_up, location.votes_down, isSelected, isHovered, isDimmed]);
 
   const position: [number, number] = [location.latitude, location.longitude];
 
@@ -102,18 +100,15 @@ export function LocationMarker({
       position={position}
       icon={icon}
       eventHandlers={{
-        click: () => selectLocation(location),
+        click: () => {
+          selectLocation(location); // centers map
+          onOpenDetail?.(location); // opens detail modal
+        },
         mouseover: () => setHoveredLocationId(location.id),
         mouseout: () => setHoveredLocationId(null),
       }}
     >
-      {/* Tooltip on hover */}
-      <Tooltip
-        direction="top"
-        offset={[0, -20]}
-        opacity={1}
-        className="custom-tooltip"
-      >
+      <Tooltip direction="top" offset={[0, -20]} opacity={1} className="custom-tooltip">
         <div className="p-2 max-w-xs">
           <div className="flex items-start gap-2">
             {location.preview_image_url && (
@@ -124,23 +119,14 @@ export function LocationMarker({
               />
             )}
             <div className="min-w-0">
-              <h4 className="font-semibold text-gray-900 text-sm truncate">
-                {location.name}
-              </h4>
+              <h4 className="font-semibold text-gray-900 text-sm truncate">{location.name}</h4>
               {tooltipDescription && (
-                <p className="text-xs text-gray-600 mt-0.5 line-clamp-2">
-                  {tooltipDescription}
-                </p>
+                <p className="text-xs text-gray-600 mt-0.5 line-clamp-2">{tooltipDescription}</p>
               )}
             </div>
           </div>
         </div>
       </Tooltip>
-
-      {/* Popup on click */}
-      <Popup className="custom-popup" maxWidth={350} minWidth={280}>
-        <MarkerPopup location={location} />
-      </Popup>
     </Marker>
   );
 }

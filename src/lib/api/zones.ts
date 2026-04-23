@@ -50,6 +50,26 @@ export async function createZone(data: {
   };
 }
 
+export async function updateZone(id: string, data: {
+  name?: string;
+  description?: string;
+  zone_type?: ZoneType;
+  color?: string;
+  fill_color?: string;
+}): Promise<Zone> {
+  const { data: zone, error } = await supabase
+    .from('zones')
+    .update(data)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  const raw = zone.vertices;
+  const vertices = Array.isArray(raw) ? raw : typeof raw === 'string' ? JSON.parse(raw) : [];
+  return { ...zone, vertices };
+}
+
 export async function deleteZone(id: string): Promise<void> {
   const { error } = await supabase
     .from('zones')

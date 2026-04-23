@@ -49,7 +49,6 @@ function MapClickHandler() {
 
   const handleClick = useCallback(
     (e: LeafletMouseEvent) => {
-      // Everyone can add locations
       if (isAddingLocation) {
         setPendingCoordinates({
           lat: e.latlng.lat,
@@ -68,12 +67,29 @@ function MapClickHandler() {
   return null;
 }
 
+export type BaseMap = 'osm' | 'satellite';
+
+const TILE_LAYERS: Record<BaseMap, { url: string; attribution: string; maxZoom: number }> = {
+  osm: {
+    url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 19,
+  },
+  satellite: {
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    attribution: '&copy; Esri &mdash; Source: Esri, DigitalGlobe, USGS',
+    maxZoom: 18,
+  },
+};
+
 interface MapContainerProps {
   className?: string;
   children?: React.ReactNode;
+  onLocationOpenDetail?: (location: import('../../types').Location) => void;
+  baseMap?: BaseMap;
 }
 
-export function MapContainer({ className = '', children }: MapContainerProps) {
+export function MapContainer({ className = '', children, onLocationOpenDetail, baseMap = 'osm' }: MapContainerProps) {
   const { isAddingLocation, pendingCoordinates, setPendingCoordinates } = useMap();
 
   const handleMarkerPositionChange = useCallback(
@@ -82,6 +98,8 @@ export function MapContainer({ className = '', children }: MapContainerProps) {
     },
     [setPendingCoordinates]
   );
+
+  const tileLayer = TILE_LAYERS[baseMap];
 
   return (
     <div className={`relative ${className}`}>
@@ -95,16 +113,15 @@ export function MapContainer({ className = '', children }: MapContainerProps) {
         <MapSync />
         <MapClickHandler />
 
-        {/* OpenStreetMap tiles - free and open source */}
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          key={baseMap}
+          attribution={tileLayer.attribution}
+          url={tileLayer.url}
+          maxZoom={tileLayer.maxZoom}
         />
 
-        {/* Location markers */}
-        <LocationMarkers />
+        <LocationMarkers onOpenDetail={onLocationOpenDetail} />
 
-        {/* Draggable marker for new location */}
         {pendingCoordinates && (
           <DraggableMarker
             position={pendingCoordinates}
@@ -112,7 +129,6 @@ export function MapContainer({ className = '', children }: MapContainerProps) {
           />
         )}
 
-        {/* Additional layers passed as children */}
         {children}
       </LeafletMapContainer>
     </div>

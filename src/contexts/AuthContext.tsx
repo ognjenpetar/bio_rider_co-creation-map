@@ -9,6 +9,7 @@ import {
 
 const ADMIN_PASSWORD = 'greenmobility';
 const STORAGE_KEY = 'bio_rider_user';
+const ADMIN_USERNAMES = ['admin', 'ognjen'];
 
 interface User {
   username: string;
@@ -61,28 +62,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
       return { success: false, error: 'Korisničko ime mora imati bar 2 karaktera' };
     }
 
-    // Check if trying to login as admin
-    if (trimmedUsername.toLowerCase() === 'admin') {
+    const lowerUsername = trimmedUsername.toLowerCase();
+    const isAdminUsername = ADMIN_USERNAMES.includes(lowerUsername);
+
+    // Admin accounts require password
+    if (isAdminUsername) {
       if (!password || password !== ADMIN_PASSWORD) {
         return { success: false, error: 'Pogrešna šifra za admin nalog' };
       }
-
-      const adminUser: User = {
-        username: 'admin',
-        isAdmin: true,
-      };
-
+      const adminUser: User = { username: trimmedUsername, isAdmin: true };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(adminUser));
       setUser(adminUser);
       return { success: true };
     }
 
     // Regular user login (no password needed)
-    const regularUser: User = {
-      username: trimmedUsername,
-      isAdmin: false,
-    };
-
+    const regularUser: User = { username: trimmedUsername, isAdmin: false };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(regularUser));
     setUser(regularUser);
     return { success: true };

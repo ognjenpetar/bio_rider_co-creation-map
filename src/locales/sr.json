@@ -127,7 +127,8 @@
   "export": {
     "title": "Export",
     "csv": "Export CSV",
-    "geojson": "Export GeoJSON"
+    "geojson": "Export GeoJSON",
+    "exporting": "Eksportujem..."
   },
   "stats": {
     "title": "Statistika",
@@ -163,6 +164,7 @@
       "restricted": "Zabranjena Zona",
       "residential": "Stambena Zona",
       "commercial": "Komercijalna Zona",
+      "biotop": "Biotop",
       "other": "Ostalo"
     }
   },
@@ -175,6 +177,7 @@
     "cycling": "Biciklizam",
     "walking": "Setnja",
     "hiking": "Planinarenje",
+    "biotop": "Biotop",
     "other": "Ostalo",
     "distance": "Udaljenost",
     "estimatedTime": "Procenjeno Vreme",
