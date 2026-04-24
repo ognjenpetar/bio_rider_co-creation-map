@@ -17,6 +17,8 @@ import { deleteLocation, updateLocation, uploadLocationImages, uploadLocationDoc
 import { deleteRoute, updateRoute } from '../../lib/api/routes';
 import { deleteZone, updateZone } from '../../lib/api/zones';
 import { getStorageUrl, STORAGE_BUCKETS } from '../../lib/supabase';
+import { getRouteImages, getRouteDocuments, uploadRouteImages, uploadRouteDocuments, deleteRouteImage, deleteRouteDocument, type RouteImage, type RouteDocument } from '../../lib/api/routeMedia';
+import { getZoneImages, getZoneDocuments, uploadZoneImages, uploadZoneDocuments, deleteZoneImage, deleteZoneDocument, type ZoneImage, type ZoneDocument } from '../../lib/api/zoneMedia';
 
 import { StarRating } from './StarRating';
 import { DeliberationPanel } from './DeliberationPanel';
@@ -60,6 +62,150 @@ const ZONE_TYPE_LABELS: Record<string, string> = {
 };
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+
+// ── Shared media sub-components ───────────────────────────────────────────────
+
+interface AnyImage { id: string; storage_path: string; file_name: string; }
+interface AnyDocument { id: string; storage_path: string; file_name: string; }
+
+function MediaViewSection({ images, documents }: { images: AnyImage[]; documents: AnyDocument[] }) {
+  if (images.length === 0 && documents.length === 0) return null;
+  return (
+    <>
+      {images.length > 0 && (
+        <div>
+          <p className="text-xs font-medium text-gray-500 mb-2">📷 Fotografije ({images.length})</p>
+          <div className="grid grid-cols-3 gap-2">
+            {images.map(img => (
+              <a key={img.id} href={getStorageUrl(STORAGE_BUCKETS.IMAGES, img.storage_path)} target="_blank" rel="noopener noreferrer">
+                <img src={getStorageUrl(STORAGE_BUCKETS.IMAGES, img.storage_path)} alt={img.file_name}
+                  className="w-full h-20 object-cover rounded-lg border border-gray-200 hover:opacity-90 transition-opacity" />
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+      {documents.length > 0 && (
+        <div>
+          <p className="text-xs font-medium text-gray-500 mb-2">📄 Dokumenti ({documents.length})</p>
+          <div className="space-y-1.5">
+            {documents.map(doc => (
+              <a key={doc.id} href={getStorageUrl(STORAGE_BUCKETS.DOCUMENTS, doc.storage_path)} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 rounded-lg px-3 py-2 text-sm text-blue-600 hover:underline transition-colors">
+                📄 {doc.file_name}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+interface MediaEditSectionProps {
+  images: AnyImage[];
+  documents: AnyDocument[];
+  newImages: File[];
+  newDocuments: File[];
+  canEdit: boolean;
+  imgInputRef: React.RefObject<HTMLInputElement>;
+  docInputRef: React.RefObject<HTMLInputElement>;
+  onAddImages: (files: File[]) => void;
+  onRemoveNewImage: (i: number) => void;
+  onAddDocuments: (files: File[]) => void;
+  onRemoveNewDocument: (i: number) => void;
+  onDeleteImage: (id: string, path: string) => Promise<void>;
+  onDeleteDocument: (id: string, path: string) => Promise<void>;
+}
+
+function MediaEditSection({ images, documents, newImages, newDocuments, canEdit, imgInputRef, docInputRef,
+  onAddImages, onRemoveNewImage, onAddDocuments, onRemoveNewDocument, onDeleteImage, onDeleteDocument }: MediaEditSectionProps) {
+  return (
+    <>
+      {/* Existing images */}
+      {images.length > 0 && (
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">Postojeće fotografije</label>
+          <div className="flex flex-wrap gap-2">
+            {images.map(img => (
+              <div key={img.id} className="relative group">
+                <img src={getStorageUrl(STORAGE_BUCKETS.IMAGES, img.storage_path)} alt={img.file_name}
+                  className="w-16 h-16 object-cover rounded-lg border border-gray-200" />
+                {canEdit && (
+                  <button type="button" onClick={() => onDeleteImage(img.id, img.storage_path)}
+                    className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">×</button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Add new images */}
+      <div>
+        <label className="block text-xs font-medium text-gray-600 mb-1">Dodaj fotografije</label>
+        <input ref={imgInputRef} type="file" accept="image/*" multiple className="hidden"
+          onChange={e => onAddImages(Array.from(e.target.files || []))} />
+        <button type="button" onClick={() => imgInputRef.current?.click()}
+          className="w-full border-2 border-dashed border-gray-300 rounded-xl py-3 text-sm text-gray-500 hover:border-green-400 hover:text-green-600 transition-colors">
+          📷 Klikni za odabir fotografija
+        </button>
+        {newImages.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-2">
+            {newImages.map((f, i) => (
+              <div key={i} className="relative group">
+                <img src={URL.createObjectURL(f)} alt="" className="w-16 h-16 object-cover rounded-lg border border-green-200" />
+                <button type="button" onClick={() => onRemoveNewImage(i)}
+                  className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">×</button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Existing documents */}
+      {documents.length > 0 && (
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">Postojeći dokumenti</label>
+          <div className="space-y-1.5">
+            {documents.map(doc => (
+              <div key={doc.id} className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2 text-sm">
+                <a href={getStorageUrl(STORAGE_BUCKETS.DOCUMENTS, doc.storage_path)} target="_blank" rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline truncate flex-1">📄 {doc.file_name}</a>
+                {canEdit && (
+                  <button type="button" onClick={() => onDeleteDocument(doc.id, doc.storage_path)}
+                    className="ml-2 text-red-400 hover:text-red-600 text-xs flex-shrink-0">Obriši</button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Add new documents */}
+      <div>
+        <label className="block text-xs font-medium text-gray-600 mb-1">Dodaj dokumente</label>
+        <input ref={docInputRef} type="file" accept=".pdf,.doc,.docx" multiple className="hidden"
+          onChange={e => onAddDocuments(Array.from(e.target.files || []))} />
+        <button type="button" onClick={() => docInputRef.current?.click()}
+          className="w-full border-2 border-dashed border-gray-300 rounded-xl py-3 text-sm text-gray-500 hover:border-green-400 hover:text-green-600 transition-colors">
+          📄 Klikni za odabir dokumenata (PDF, DOC)
+        </button>
+        {newDocuments.length > 0 && (
+          <div className="space-y-1.5 mt-2">
+            {newDocuments.map((f, i) => (
+              <div key={i} className="flex items-center justify-between bg-green-50 rounded-lg px-3 py-2 text-sm">
+                <span className="truncate text-gray-700">📄 {f.name}</span>
+                <button type="button" onClick={() => onRemoveNewDocument(i)}
+                  className="ml-2 text-red-400 hover:text-red-600 text-xs flex-shrink-0">×</button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
 
 function entityTypeLabel(entity: SelectedEntity): { icon: string; label: string; color: string } {
   if (entity.type === 'route') return { icon: ROUTE_TYPE_ICONS[entity.data.route_type] || '📍', label: 'Ruta', color: 'blue' };
@@ -106,9 +252,13 @@ export function EntityDetailModal({ entity, onClose, onDeleted, onUpdated }: Ent
   const [editTimeMin, setEditTimeMin] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
-  // Images & documents (locations only)
+  // Images & documents (all entity types)
   const [locImages, setLocImages] = useState<LocationImage[]>([]);
   const [locDocuments, setLocDocuments] = useState<LocationDocument[]>([]);
+  const [routeImages, setRouteImages] = useState<RouteImage[]>([]);
+  const [routeDocuments, setRouteDocuments] = useState<RouteDocument[]>([]);
+  const [zoneImages, setZoneImages] = useState<ZoneImage[]>([]);
+  const [zoneDocuments, setZoneDocuments] = useState<ZoneDocument[]>([]);
   const [newImages, setNewImages] = useState<File[]>([]);
   const [newDocuments, setNewDocuments] = useState<File[]>([]);
   const imgInputRef = useRef<HTMLInputElement>(null);
@@ -161,11 +311,17 @@ export function EntityDetailModal({ entity, onClose, onDeleted, onUpdated }: Ent
   }, [entityId, entityType]);
 
   const loadMedia = useCallback(async () => {
-    if (entityType !== 'location') return;
     try {
-      const [imgs, docs] = await Promise.all([getLocationImages(entityId), getLocationDocuments(entityId)]);
-      setLocImages(imgs);
-      setLocDocuments(docs);
+      if (entityType === 'location') {
+        const [imgs, docs] = await Promise.all([getLocationImages(entityId), getLocationDocuments(entityId)]);
+        setLocImages(imgs); setLocDocuments(docs);
+      } else if (entityType === 'route') {
+        const [imgs, docs] = await Promise.all([getRouteImages(entityId), getRouteDocuments(entityId)]);
+        setRouteImages(imgs); setRouteDocuments(docs);
+      } else {
+        const [imgs, docs] = await Promise.all([getZoneImages(entityId), getZoneDocuments(entityId)]);
+        setZoneImages(imgs); setZoneDocuments(docs);
+      }
     } catch { /* silent */ }
   }, [entityId, entityType]);
 
@@ -298,6 +454,10 @@ export function EntityDetailModal({ entity, onClose, onDeleted, onUpdated }: Ent
           distance_km: editDistKm ? parseFloat(editDistKm) : null,
           estimated_time_min: editTimeMin ? parseInt(editTimeMin) : null,
         });
+        if (newImages.length > 0) await uploadRouteImages(entityId, newImages);
+        if (newDocuments.length > 0) await uploadRouteDocuments(entityId, newDocuments);
+        setNewImages([]); setNewDocuments([]);
+        await loadMedia();
       } else {
         await updateZone(entityId, {
           name: editName.trim(),
@@ -306,6 +466,10 @@ export function EntityDetailModal({ entity, onClose, onDeleted, onUpdated }: Ent
           color: editColor,
           fill_color: editFillColor,
         });
+        if (newImages.length > 0) await uploadZoneImages(entityId, newImages);
+        if (newDocuments.length > 0) await uploadZoneDocuments(entityId, newDocuments);
+        setNewImages([]); setNewDocuments([]);
+        await loadMedia();
       }
       setIsEditing(false);
       onUpdated?.();
@@ -481,120 +645,20 @@ export function EntityDetailModal({ entity, onClose, onDeleted, onUpdated }: Ent
                       <>
                         <div>
                           <label className="block text-xs font-medium text-gray-600 mb-1">Opis (SR)</label>
-                          <textarea
-                            value={editDescSr}
-                            onChange={e => setEditDescSr(e.target.value)}
-                            rows={2}
-                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 outline-none resize-none"
-                          />
+                          <textarea value={editDescSr} onChange={e => setEditDescSr(e.target.value)} rows={2}
+                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 outline-none resize-none" />
                         </div>
                         <div>
                           <label className="block text-xs font-medium text-gray-600 mb-1">Opis (EN)</label>
-                          <textarea
-                            value={editDescEn}
-                            onChange={e => setEditDescEn(e.target.value)}
-                            rows={2}
-                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 outline-none resize-none"
-                          />
-                        </div>
-
-                        {/* Existing images */}
-                        {locImages.length > 0 && (
-                          <div>
-                            <label className="block text-xs font-medium text-gray-600 mb-1">Postojeće fotografije</label>
-                            <div className="flex flex-wrap gap-2">
-                              {locImages.map(img => (
-                                <div key={img.id} className="relative group">
-                                  <img
-                                    src={getStorageUrl(STORAGE_BUCKETS.IMAGES, img.storage_path)}
-                                    alt={img.file_name}
-                                    className="w-16 h-16 object-cover rounded-lg border border-gray-200"
-                                  />
-                                  {canEdit && (
-                                    <button
-                                      type="button"
-                                      onClick={async () => { await deleteLocationImage(img.id, img.storage_path); await loadMedia(); }}
-                                      className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                                    >×</button>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Add new images */}
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1">Dodaj fotografije</label>
-                          <input ref={imgInputRef} type="file" accept="image/*" multiple className="hidden"
-                            onChange={e => setNewImages(prev => [...prev, ...Array.from(e.target.files || [])])} />
-                          <button type="button" onClick={() => imgInputRef.current?.click()}
-                            className="w-full border-2 border-dashed border-gray-300 rounded-xl py-3 text-sm text-gray-500 hover:border-green-400 hover:text-green-600 transition-colors">
-                            📷 Klikni za odabir fotografija
-                          </button>
-                          {newImages.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mt-2">
-                              {newImages.map((f, i) => (
-                                <div key={i} className="relative group">
-                                  <img src={URL.createObjectURL(f)} alt="" className="w-16 h-16 object-cover rounded-lg border border-green-200" />
-                                  <button type="button" onClick={() => setNewImages(prev => prev.filter((_, j) => j !== i))}
-                                    className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">×</button>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Existing documents */}
-                        {locDocuments.length > 0 && (
-                          <div>
-                            <label className="block text-xs font-medium text-gray-600 mb-1">Postojeći dokumenti</label>
-                            <div className="space-y-1.5">
-                              {locDocuments.map(doc => (
-                                <div key={doc.id} className="flex items-center justify-between bg-gray-50 rounded-lg px-3 py-2 text-sm">
-                                  <a href={getStorageUrl(STORAGE_BUCKETS.DOCUMENTS, doc.storage_path)} target="_blank" rel="noopener noreferrer"
-                                    className="text-blue-600 hover:underline truncate flex-1">📄 {doc.file_name}</a>
-                                  {canEdit && (
-                                    <button type="button" onClick={async () => { await deleteLocationDocument(doc.id, doc.storage_path); await loadMedia(); }}
-                                      className="ml-2 text-red-400 hover:text-red-600 text-xs flex-shrink-0">Obriši</button>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Add new documents */}
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1">Dodaj dokumente</label>
-                          <input ref={docInputRef} type="file" accept=".pdf,.doc,.docx" multiple className="hidden"
-                            onChange={e => setNewDocuments(prev => [...prev, ...Array.from(e.target.files || [])])} />
-                          <button type="button" onClick={() => docInputRef.current?.click()}
-                            className="w-full border-2 border-dashed border-gray-300 rounded-xl py-3 text-sm text-gray-500 hover:border-green-400 hover:text-green-600 transition-colors">
-                            📄 Klikni za odabir dokumenata (PDF, DOC)
-                          </button>
-                          {newDocuments.length > 0 && (
-                            <div className="space-y-1.5 mt-2">
-                              {newDocuments.map((f, i) => (
-                                <div key={i} className="flex items-center justify-between bg-green-50 rounded-lg px-3 py-2 text-sm">
-                                  <span className="truncate text-gray-700">📄 {f.name}</span>
-                                  <button type="button" onClick={() => setNewDocuments(prev => prev.filter((_, j) => j !== i))}
-                                    className="ml-2 text-red-400 hover:text-red-600 text-xs flex-shrink-0">×</button>
-                                </div>
-                              ))}
-                            </div>
-                          )}
+                          <textarea value={editDescEn} onChange={e => setEditDescEn(e.target.value)} rows={2}
+                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 outline-none resize-none" />
                         </div>
                       </>
                     ) : (
                       <div>
                         <label className="block text-xs font-medium text-gray-600 mb-1">Opis</label>
-                        <textarea
-                          value={editDesc}
-                          onChange={e => setEditDesc(e.target.value)}
-                          rows={2}
-                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 outline-none resize-none"
-                        />
+                        <textarea value={editDesc} onChange={e => setEditDesc(e.target.value)} rows={2}
+                          className="w-full px-3 py-2 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 outline-none resize-none" />
                       </div>
                     )}
 
@@ -684,6 +748,33 @@ export function EntityDetailModal({ entity, onClose, onDeleted, onUpdated }: Ent
                       </>
                     )}
 
+                    {/* ── Media upload (all types) ── */}
+                    <MediaEditSection
+                      images={entityType === 'location' ? locImages : entityType === 'route' ? routeImages : zoneImages}
+                      documents={entityType === 'location' ? locDocuments : entityType === 'route' ? routeDocuments : zoneDocuments}
+                      newImages={newImages}
+                      newDocuments={newDocuments}
+                      canEdit={canEdit}
+                      imgInputRef={imgInputRef}
+                      docInputRef={docInputRef}
+                      onAddImages={files => setNewImages(prev => [...prev, ...files])}
+                      onRemoveNewImage={i => setNewImages(prev => prev.filter((_, j) => j !== i))}
+                      onAddDocuments={files => setNewDocuments(prev => [...prev, ...files])}
+                      onRemoveNewDocument={i => setNewDocuments(prev => prev.filter((_, j) => j !== i))}
+                      onDeleteImage={async (id, path) => {
+                        if (entityType === 'location') await deleteLocationImage(id, path);
+                        else if (entityType === 'route') await deleteRouteImage(id, path);
+                        else await deleteZoneImage(id, path);
+                        await loadMedia();
+                      }}
+                      onDeleteDocument={async (id, path) => {
+                        if (entityType === 'location') await deleteLocationDocument(id, path);
+                        else if (entityType === 'route') await deleteRouteDocument(id, path);
+                        else await deleteZoneDocument(id, path);
+                        await loadMedia();
+                      }}
+                    />
+
                     <div className="flex gap-2 pt-1">
                       <button
                         onClick={() => setIsEditing(false)}
@@ -736,38 +827,11 @@ export function EntityDetailModal({ entity, onClose, onDeleted, onUpdated }: Ent
                       </div>
                     )}
 
-                    {/* Image gallery (locations) */}
-                    {entityType === 'location' && locImages.length > 0 && (
-                      <div>
-                        <p className="text-xs font-medium text-gray-500 mb-2">📷 Fotografije ({locImages.length})</p>
-                        <div className="grid grid-cols-3 gap-2">
-                          {locImages.map(img => (
-                            <a key={img.id} href={getStorageUrl(STORAGE_BUCKETS.IMAGES, img.storage_path)} target="_blank" rel="noopener noreferrer">
-                              <img
-                                src={getStorageUrl(STORAGE_BUCKETS.IMAGES, img.storage_path)}
-                                alt={img.file_name}
-                                className="w-full h-20 object-cover rounded-lg border border-gray-200 hover:opacity-90 transition-opacity"
-                              />
-                            </a>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Documents (locations) */}
-                    {entityType === 'location' && locDocuments.length > 0 && (
-                      <div>
-                        <p className="text-xs font-medium text-gray-500 mb-2">📄 Dokumenti ({locDocuments.length})</p>
-                        <div className="space-y-1.5">
-                          {locDocuments.map(doc => (
-                            <a key={doc.id} href={getStorageUrl(STORAGE_BUCKETS.DOCUMENTS, doc.storage_path)} target="_blank" rel="noopener noreferrer"
-                              className="flex items-center gap-2 bg-gray-50 hover:bg-gray-100 rounded-lg px-3 py-2 text-sm text-blue-600 hover:underline transition-colors">
-                              📄 {doc.file_name}
-                            </a>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                    {/* Image gallery */}
+                    <MediaViewSection
+                      images={entityType === 'location' ? locImages : entityType === 'route' ? routeImages : zoneImages}
+                      documents={entityType === 'location' ? locDocuments : entityType === 'route' ? routeDocuments : zoneDocuments}
+                    />
 
                     {(canEdit || canDelete) && (
                       <div className="flex gap-2 pt-2">

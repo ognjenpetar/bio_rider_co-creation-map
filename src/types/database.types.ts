@@ -543,6 +543,30 @@ export interface Database {
         Update: { id?: string; zone_id?: string; username?: string; comment?: string | null; rating?: number; created_at?: string; };
         Relationships: [];
       };
+      route_images: {
+        Row: { id: string; route_id: string; storage_path: string; file_name: string; file_size: number | null; mime_type: string | null; display_order: number; created_by: string | null; created_at: string; };
+        Insert: { id?: string; route_id: string; storage_path: string; file_name: string; file_size?: number | null; mime_type?: string | null; display_order?: number; created_by?: string | null; created_at?: string; };
+        Update: { id?: string; route_id?: string; storage_path?: string; file_name?: string; file_size?: number | null; mime_type?: string | null; display_order?: number; created_by?: string | null; created_at?: string; };
+        Relationships: [];
+      };
+      route_documents: {
+        Row: { id: string; route_id: string; storage_path: string; file_name: string; file_size: number | null; mime_type: string | null; created_by: string | null; created_at: string; };
+        Insert: { id?: string; route_id: string; storage_path: string; file_name: string; file_size?: number | null; mime_type?: string | null; created_by?: string | null; created_at?: string; };
+        Update: { id?: string; route_id?: string; storage_path?: string; file_name?: string; file_size?: number | null; mime_type?: string | null; created_by?: string | null; created_at?: string; };
+        Relationships: [];
+      };
+      zone_images: {
+        Row: { id: string; zone_id: string; storage_path: string; file_name: string; file_size: number | null; mime_type: string | null; display_order: number; created_by: string | null; created_at: string; };
+        Insert: { id?: string; zone_id: string; storage_path: string; file_name: string; file_size?: number | null; mime_type?: string | null; display_order?: number; created_by?: string | null; created_at?: string; };
+        Update: { id?: string; zone_id?: string; storage_path?: string; file_name?: string; file_size?: number | null; mime_type?: string | null; display_order?: number; created_by?: string | null; created_at?: string; };
+        Relationships: [];
+      };
+      zone_documents: {
+        Row: { id: string; zone_id: string; storage_path: string; file_name: string; file_size: number | null; mime_type: string | null; created_by: string | null; created_at: string; };
+        Insert: { id?: string; zone_id: string; storage_path: string; file_name: string; file_size?: number | null; mime_type?: string | null; created_by?: string | null; created_at?: string; };
+        Update: { id?: string; zone_id?: string; storage_path?: string; file_name?: string; file_size?: number | null; mime_type?: string | null; created_by?: string | null; created_at?: string; };
+        Relationships: [];
+      };
       user_bans: {
         Row: { id: string; username: string; ban_type: 'permanent' | 'temporary'; ban_until: string | null; reason: string | null; banned_by: string; created_at: string; };
         Insert: { id?: string; username: string; ban_type: 'permanent' | 'temporary'; ban_until?: string | null; reason?: string | null; banned_by?: string; created_at?: string; };
