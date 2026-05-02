@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from 'react';
 
-const ADMIN_PASSWORD = 'greenmobility';
+const ADMIN_PASSWORD = 'zelenamobilnost2026';
 const STORAGE_KEY = 'bio_rider_user';
 const ADMIN_USERNAMES = ['admin', 'ognjen'];
 

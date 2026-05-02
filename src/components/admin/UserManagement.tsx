@@ -1,12 +1,21 @@
 import { useState, useEffect } from 'react';
 import { listUsers, banUser, unbanUser, deleteAllUserEntries, type UserSummary } from '../../lib/api/userManagement';
 
+type BanPreset = '5min' | '24h' | 'permanent' | 'custom';
+
+function presetToUntil(preset: BanPreset): string | null {
+  const now = new Date();
+  if (preset === '5min') { now.setMinutes(now.getMinutes() + 5); return now.toISOString(); }
+  if (preset === '24h') { now.setHours(now.getHours() + 24); return now.toISOString(); }
+  return null;
+}
+
 export function UserManagement() {
   const [users, setUsers] = useState<UserSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState<UserSummary | null>(null);
-  const [banType, setBanType] = useState<'permanent' | 'temporary'>('permanent');
-  const [banUntil, setBanUntil] = useState('');
+  const [preset, setPreset] = useState<BanPreset>('permanent');
+  const [customUntil, setCustomUntil] = useState('');
   const [banReason, setBanReason] = useState('');
   const [working, setWorking] = useState(false);
   const [search, setSearch] = useState('');
@@ -19,16 +28,25 @@ export function UserManagement() {
 
   useEffect(() => { load(); }, []);
 
+  const openBan = (u: UserSummary) => {
+    setSelectedUser(u);
+    setPreset('permanent');
+    setCustomUntil('');
+    setBanReason('');
+  };
+
   const handleBan = async () => {
     if (!selectedUser) return;
     setWorking(true);
     try {
-      await banUser(selectedUser.username, banType, banType === 'temporary' ? banUntil : null, banReason);
+      const isPerm = preset === 'permanent';
+      const ban_until = isPerm ? null : preset === 'custom' ? (customUntil ? new Date(customUntil).toISOString() : null) : presetToUntil(preset);
+      await banUser(selectedUser.username, isPerm ? 'permanent' : 'temporary', ban_until, banReason);
       setSelectedUser(null);
-      setBanReason('');
-      setBanUntil('');
+    } catch { /* silent */ } finally {
+      setWorking(false);
       await load();
-    } catch { /* silent */ } finally { setWorking(false); }
+    }
   };
 
   const handleUnban = async (username: string) => {
@@ -45,9 +63,37 @@ export function UserManagement() {
   };
 
   const filtered = users.filter(u => u.username.toLowerCase().includes(search.toLowerCase()));
+  const totalUsers = users.length;
+  const activeUsers = users.filter(u => !u.ban).length;
+  const bannedUsers = users.filter(u => !!u.ban).length;
+
+  const presets: { id: BanPreset; label: string }[] = [
+    { id: '5min', label: '5 min' },
+    { id: '24h', label: '24h' },
+    { id: 'permanent', label: 'Trajno' },
+    { id: 'custom', label: 'Prilagođeno' },
+  ];
+
+  const canSubmit = preset !== 'custom' || !!customUntil;
 
   return (
     <div>
+      {/* Summary stats */}
+      <div className="grid grid-cols-3 gap-3 mb-5">
+        <div className="bg-blue-50 border border-blue-100 rounded-xl p-3 text-center">
+          <div className="text-2xl font-bold text-blue-700">{totalUsers}</div>
+          <div className="text-xs text-blue-600 mt-0.5">Ukupno učesnika</div>
+        </div>
+        <div className="bg-green-50 border border-green-100 rounded-xl p-3 text-center">
+          <div className="text-2xl font-bold text-green-700">{activeUsers}</div>
+          <div className="text-xs text-green-600 mt-0.5">Aktivnih</div>
+        </div>
+        <div className="bg-red-50 border border-red-100 rounded-xl p-3 text-center">
+          <div className="text-2xl font-bold text-red-700">{bannedUsers}</div>
+          <div className="text-xs text-red-600 mt-0.5">Blokiranih</div>
+        </div>
+      </div>
+
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-gray-900">Upravljanje korisnicima</h2>
         <input
@@ -72,6 +118,7 @@ export function UserManagement() {
                 <th className="text-center py-2 px-3 font-semibold text-gray-700">Rute</th>
                 <th className="text-center py-2 px-3 font-semibold text-gray-700">Zone</th>
                 <th className="text-center py-2 px-3 font-semibold text-gray-700">Kom.</th>
+                <th className="text-center py-2 px-3 font-semibold text-gray-700">Glas.</th>
                 <th className="text-center py-2 px-3 font-semibold text-gray-700">Status</th>
                 <th className="text-right py-2 px-3 font-semibold text-gray-700">Akcije</th>
               </tr>
@@ -87,6 +134,7 @@ export function UserManagement() {
                     <td className="py-2.5 px-3 text-center text-gray-600">{u.routes}</td>
                     <td className="py-2.5 px-3 text-center text-gray-600">{u.zones}</td>
                     <td className="py-2.5 px-3 text-center text-gray-600">{u.comments}</td>
+                    <td className="py-2.5 px-3 text-center text-gray-600">{u.votes}</td>
                     <td className="py-2.5 px-3 text-center">
                       {isBanned ? (
                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold rounded-full ${isTemp ? 'bg-orange-100 text-orange-700' : 'bg-red-100 text-red-700'}`}>
@@ -110,7 +158,7 @@ export function UserManagement() {
                           </button>
                         ) : (
                           <button
-                            onClick={() => { setSelectedUser(u); setBanType('permanent'); setBanReason(''); setBanUntil(''); }}
+                            onClick={() => openBan(u)}
                             disabled={working}
                             className="px-2.5 py-1 text-xs font-medium bg-red-50 text-red-700 rounded-lg hover:bg-red-100 disabled:opacity-50"
                           >
@@ -139,27 +187,38 @@ export function UserManagement() {
       {selectedUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 space-y-4">
-            <h3 className="font-bold text-gray-900">Blokiraj korisnika: <span className="text-red-600">{selectedUser.username}</span></h3>
+            <h3 className="font-bold text-gray-900">
+              Blokiraj korisnika: <span className="text-red-600">{selectedUser.username}</span>
+            </h3>
 
-            <div className="flex gap-2">
-              {(['permanent', 'temporary'] as const).map(t => (
+            {/* Preset buttons */}
+            <div className="grid grid-cols-2 gap-2">
+              {presets.map(p => (
                 <button
-                  key={t}
-                  onClick={() => setBanType(t)}
-                  className={`flex-1 py-2 text-sm font-medium rounded-xl border-2 transition-colors ${banType === t ? 'border-red-400 bg-red-50 text-red-700' : 'border-gray-200 text-gray-600 hover:border-gray-300'}`}
+                  key={p.id}
+                  onClick={() => setPreset(p.id)}
+                  className={`py-2 text-sm font-medium rounded-xl border-2 transition-colors ${
+                    preset === p.id
+                      ? 'border-red-400 bg-red-50 text-red-700'
+                      : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                  }`}
                 >
-                  {t === 'permanent' ? '🚫 Trajno' : '⏱ Privremeno'}
+                  {p.id === '5min' && '⏱ '}
+                  {p.id === '24h' && '🕐 '}
+                  {p.id === 'permanent' && '🚫 '}
+                  {p.id === 'custom' && '📅 '}
+                  {p.label}
                 </button>
               ))}
             </div>
 
-            {banType === 'temporary' && (
+            {preset === 'custom' && (
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">Zabranjeno do</label>
                 <input
                   type="datetime-local"
-                  value={banUntil}
-                  onChange={e => setBanUntil(e.target.value)}
+                  value={customUntil}
+                  onChange={e => setCustomUntil(e.target.value)}
                   className="w-full px-3 py-2 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500 outline-none"
                 />
               </div>
@@ -184,10 +243,10 @@ export function UserManagement() {
               </button>
               <button
                 onClick={handleBan}
-                disabled={working || (banType === 'temporary' && !banUntil)}
+                disabled={working || !canSubmit}
                 className="flex-1 py-2 text-sm font-medium bg-red-600 text-white rounded-xl hover:bg-red-700 disabled:opacity-50"
               >
-                Blokiraj
+                {working ? 'Čekaj...' : 'Blokiraj'}
               </button>
             </div>
           </div>

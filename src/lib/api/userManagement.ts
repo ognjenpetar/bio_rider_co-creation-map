@@ -16,17 +16,21 @@ export interface UserSummary {
   routes: number;
   zones: number;
   comments: number;
+  votes: number;
   ban: UserBan | null;
 }
 
 export async function listUsers(): Promise<UserSummary[]> {
-  const [locs, routes, zones, locComments, routeComments, zoneComments, bans] = await Promise.all([
+  const [locs, routes, zones, locComments, routeComments, zoneComments, locVotes, routeVotes, zoneVotes, bans] = await Promise.all([
     supabase.from('locations').select('created_by').eq('is_active', true),
     supabase.from('routes').select('created_by').eq('is_active', true),
     supabase.from('zones').select('created_by').eq('is_active', true),
     supabase.from('location_comments').select('username'),
     supabase.from('route_comments').select('username'),
     supabase.from('zone_comments').select('username'),
+    supabase.from('location_votes').select('username'),
+    supabase.from('route_votes').select('username'),
+    supabase.from('zone_votes').select('username'),
     supabase.from('user_bans').select('*'),
   ]);
 
@@ -36,7 +40,7 @@ export async function listUsers(): Promise<UserSummary[]> {
   const counters = new Map<string, UserSummary>();
   const get = (u: string) => {
     const key = u.toLowerCase();
-    if (!counters.has(key)) counters.set(key, { username: u, locations: 0, routes: 0, zones: 0, comments: 0, ban: banMap.get(key) || null });
+    if (!counters.has(key)) counters.set(key, { username: u, locations: 0, routes: 0, zones: 0, comments: 0, votes: 0, ban: banMap.get(key) || null });
     return counters.get(key)!;
   };
 
@@ -46,9 +50,12 @@ export async function listUsers(): Promise<UserSummary[]> {
   (locComments.data || []).forEach(r => r.username && get(r.username).comments++);
   (routeComments.data || []).forEach(r => r.username && get(r.username).comments++);
   (zoneComments.data || []).forEach(r => r.username && get(r.username).comments++);
+  (locVotes.data || []).forEach(r => r.username && get(r.username).votes++);
+  (routeVotes.data || []).forEach(r => r.username && get(r.username).votes++);
+  (zoneVotes.data || []).forEach(r => r.username && get(r.username).votes++);
 
   return Array.from(counters.values()).sort((a, b) =>
-    (b.locations + b.routes + b.zones + b.comments) - (a.locations + a.routes + a.zones + a.comments)
+    (b.locations + b.routes + b.zones + b.comments + b.votes) - (a.locations + a.routes + a.zones + a.comments + a.votes)
   );
 }
 
