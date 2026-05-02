@@ -38,7 +38,11 @@
     "viewAllLocations": "View All Locations",
     "allLocations": "All Locations",
     "totalLocations": "{{count}} location",
-    "totalLocations_plural": "{{count}} locations"
+    "totalLocations_plural": "{{count}} locations",
+    "statsLocations": "locations entered",
+    "statsUsers": "participants",
+    "satellite": "Satellite",
+    "osm": "OSM"
   },
   "location": {
     "name": "Name",
@@ -158,6 +162,7 @@
     "vertices": "vertices",
     "polygonReady": "polygon ready",
     "finish": "Finish & Save",
+    "saveError": "Failed to save zone. Please try again.",
     "types": {
       "park": "Park",
       "cycling": "Cycling Zone",
@@ -189,7 +194,8 @@
     "points": "points",
     "cancel": "Cancel",
     "deleteConfirm": "Delete this route?",
-    "noRoutes": "No routes yet"
+    "noRoutes": "No routes yet",
+    "saveError": "Failed to save route. Please try again."
   },
   "timeMachine": {
     "title": "Time Machine",

@@ -38,7 +38,11 @@
     "viewAllLocations": "Pregledaj Sve Lokacije",
     "allLocations": "Sve Lokacije",
     "totalLocations": "{{count}} lokacija",
-    "totalLocations_plural": "{{count}} lokacija"
+    "totalLocations_plural": "{{count}} lokacija",
+    "statsLocations": "unetih lokacija",
+    "statsUsers": "učesnika",
+    "satellite": "Satelit",
+    "osm": "OSM"
   },
   "location": {
     "name": "Naziv",
@@ -158,6 +162,7 @@
     "vertices": "temena",
     "polygonReady": "poligon spreman",
     "finish": "Zavrsi i Sacuvaj",
+    "saveError": "Greška pri čuvanju zone. Pokušajte ponovo.",
     "types": {
       "park": "Park",
       "cycling": "Zona za Biciklizam",
@@ -189,7 +194,8 @@
     "points": "tacaka",
     "cancel": "Otkazi",
     "deleteConfirm": "Obrisati ovu rutu?",
-    "noRoutes": "Nema ruta"
+    "noRoutes": "Nema ruta",
+    "saveError": "Greška pri čuvanju rute. Pokušajte ponovo."
   },
   "timeMachine": {
     "title": "Vremeplov",
