@@ -20,6 +20,7 @@ import { useSearch } from '../hooks/useSearch';
 import { exportAsCSV, exportAllAsGeoJSON, exportAsPDF } from '../lib/export';
 import { createRoute, getRoutes } from '../lib/api/routes';
 import { createZone, getZones } from '../lib/api/zones';
+import { getBasicStats, type BasicStats } from '../lib/api/stats';
 import { EntityDetailModal, type SelectedEntity } from '../components/map/EntityDetailModal';
 import type { Location, LocationFormData, Coordinates, ZoneType } from '../types';
 
@@ -87,6 +88,7 @@ export function MapPage() {
   const [isExportingGeoJSON, setIsExportingGeoJSON] = useState(false);
   const [isExportingPDF, setIsExportingPDF] = useState(false);
   const [baseMap, setBaseMap] = useState<'osm' | 'satellite'>('osm');
+  const [stats, setStats] = useState<BasicStats | null>(null);
 
   // Entity detail modal
   const [selectedEntity, setSelectedEntity] = useState<SelectedEntity | null>(null);
@@ -103,6 +105,10 @@ export function MapPage() {
       }
     }
   }, [searchParams, mapLocations, centerOnLocation, selectLocation, setSearchParams]);
+
+  useEffect(() => {
+    getBasicStats().then(setStats).catch(() => {});
+  }, []);
 
   const handleAddLocation = () => {
     setIsAddingLocation(true);
@@ -729,6 +735,21 @@ export function MapPage() {
             )}
           </AnimatePresence>
         </div>
+
+        {/* Stats bar */}
+        {stats && (
+          <div className="bg-white border-t border-gray-100 px-4 py-2 flex items-center gap-6">
+            <div className="flex items-center gap-1.5 text-sm text-gray-600">
+              <span className="text-green-600 font-bold text-base">{stats.locationCount}</span>
+              <span>unetih lokacija</span>
+            </div>
+            <div className="w-px h-4 bg-gray-200" />
+            <div className="flex items-center gap-1.5 text-sm text-gray-600">
+              <span className="text-blue-600 font-bold text-base">{stats.userCount}</span>
+              <span>učesnika</span>
+            </div>
+          </div>
+        )}
 
         {/* Footer */}
         <footer className="bg-white border-t border-gray-200 px-4 py-3">

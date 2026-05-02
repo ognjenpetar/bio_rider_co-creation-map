@@ -14,8 +14,8 @@ export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
 
-  // Check if username is "admin" to show password field
-  const isAdminUsername = username.trim().toLowerCase() === 'admin';
+  // Check if username is an admin account to show password field
+  const isAdminUsername = ['admin', 'ognjen'].includes(username.trim().toLowerCase());
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -96,7 +96,7 @@ export function LoginPage() {
                     setUsername(e.target.value);
                     setError('');
                     // Reset password when changing username
-                    if (e.target.value.trim().toLowerCase() !== 'admin') {
+                    if (!['admin', 'ognjen'].includes(e.target.value.trim().toLowerCase())) {
                       setPassword('');
                       setShowPassword(false);
                     }
