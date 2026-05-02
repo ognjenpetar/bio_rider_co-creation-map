@@ -22,6 +22,7 @@ import { createRoute, getRoutes } from '../lib/api/routes';
 import { createZone, getZones } from '../lib/api/zones';
 import { getBasicStats, type BasicStats } from '../lib/api/stats';
 import { EntityDetailModal, type SelectedEntity } from '../components/map/EntityDetailModal';
+import { calcAutoRadius, type HeatmapOptions } from '../components/map/HeatmapLayer';
 import type { Location, LocationFormData, Coordinates, ZoneType } from '../types';
 
 // Haversine formula for route distance calculation
@@ -62,6 +63,9 @@ export function MapPage() {
 
   // Layer states — default routes & zones to ON so saved data is always visible
   const [showHeatmap, setShowHeatmap] = useState(false);
+  const [showHeatmapSettings, setShowHeatmapSettings] = useState(false);
+  const [heatmapOptions, setHeatmapOptions] = useState<HeatmapOptions>({ radius: 35, blur: 25, intensity: 0.8 });
+  const [heatmapAutoRadius, setHeatmapAutoRadius] = useState(35);
   const [showRoutes, setShowRoutes] = useState(true);
   const [showZones, setShowZones] = useState(true);
   const [showTimeMachine, setShowTimeMachine] = useState(false);
@@ -109,6 +113,13 @@ export function MapPage() {
   useEffect(() => {
     getBasicStats().then(setStats).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (mapLocations.length < 2) return;
+    const auto = calcAutoRadius(mapLocations);
+    setHeatmapAutoRadius(auto);
+    setHeatmapOptions(prev => ({ ...prev, radius: auto }));
+  }, [mapLocations]);
 
   const handleAddLocation = () => {
     setIsAddingLocation(true);
@@ -292,22 +303,116 @@ export function MapPage() {
               )}
             </div>
 
-            {/* Heatmap toggle */}
-            <button
-              onClick={() => setShowHeatmap(h => !h)}
-              className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                showHeatmap
-                  ? 'bg-orange-100 text-orange-700 ring-2 ring-orange-400'
-                  : 'bg-gray-100 text-gray-700 hover:bg-orange-50 hover:text-orange-700'
-              }`}
-              title={t('layers.heatmap')}
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
-              </svg>
-              <span className="hidden sm:inline">{t('layers.heatmap')}</span>
-            </button>
+            {/* Heatmap toggle + settings */}
+            <div className="relative">
+              <div className="flex items-center">
+                <button
+                  onClick={() => { setShowHeatmap(h => !h); if (!showHeatmap) setShowHeatmapSettings(false); }}
+                  className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-l-lg transition-colors ${
+                    showHeatmap
+                      ? 'bg-orange-100 text-orange-700 ring-2 ring-orange-400 ring-r-0'
+                      : 'bg-gray-100 text-gray-700 hover:bg-orange-50 hover:text-orange-700'
+                  }`}
+                  title={t('layers.heatmap')}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
+                  </svg>
+                  <span className="hidden sm:inline">{t('layers.heatmap')}</span>
+                </button>
+                {showHeatmap && (
+                  <button
+                    onClick={() => setShowHeatmapSettings(s => !s)}
+                    className={`px-2 py-2 text-sm font-medium rounded-r-lg border-l border-orange-200 transition-colors ${
+                      showHeatmapSettings ? 'bg-orange-200 text-orange-800' : 'bg-orange-100 text-orange-600 hover:bg-orange-200'
+                    }`}
+                    title="Podešavanja heatmape"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+
+              {/* Heatmap settings panel */}
+              <AnimatePresence>
+                {showHeatmap && showHeatmapSettings && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    className="absolute left-0 mt-1 bg-white rounded-xl shadow-xl border border-gray-200 z-50 w-64 p-4"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm font-semibold text-gray-800">Podešavanja Heatmape</span>
+                      <button
+                        onClick={() => setHeatmapOptions(prev => ({ ...prev, radius: heatmapAutoRadius }))}
+                        className="text-xs text-orange-600 hover:text-orange-700 font-medium"
+                        title="Resetuj na auto vrednost"
+                      >
+                        Auto ({heatmapAutoRadius}px)
+                      </button>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div>
+                        <div className="flex justify-between text-xs text-gray-500 mb-1">
+                          <span>Radijus</span>
+                          <span className="font-mono font-semibold text-gray-700">{heatmapOptions.radius}px</span>
+                        </div>
+                        <input
+                          type="range" min={10} max={100} step={1}
+                          value={heatmapOptions.radius}
+                          onChange={e => setHeatmapOptions(prev => ({ ...prev, radius: +e.target.value }))}
+                          className="w-full accent-orange-500"
+                        />
+                        <div className="flex justify-between text-xs text-gray-400 mt-0.5">
+                          <span>Gusto</span><span>Široko</span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="flex justify-between text-xs text-gray-500 mb-1">
+                          <span>Zamućenje (blur)</span>
+                          <span className="font-mono font-semibold text-gray-700">{heatmapOptions.blur}px</span>
+                        </div>
+                        <input
+                          type="range" min={5} max={50} step={1}
+                          value={heatmapOptions.blur}
+                          onChange={e => setHeatmapOptions(prev => ({ ...prev, blur: +e.target.value }))}
+                          className="w-full accent-orange-500"
+                        />
+                        <div className="flex justify-between text-xs text-gray-400 mt-0.5">
+                          <span>Oštro</span><span>Meko</span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="flex justify-between text-xs text-gray-500 mb-1">
+                          <span>Intenzitet</span>
+                          <span className="font-mono font-semibold text-gray-700">{Math.round(heatmapOptions.intensity * 100)}%</span>
+                        </div>
+                        <input
+                          type="range" min={0.1} max={1} step={0.05}
+                          value={heatmapOptions.intensity}
+                          onChange={e => setHeatmapOptions(prev => ({ ...prev, intensity: +e.target.value }))}
+                          className="w-full accent-orange-500"
+                        />
+                        <div className="flex justify-between text-xs text-gray-400 mt-0.5">
+                          <span>Slabo</span><span>Jako</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-3 pt-3 border-t border-gray-100 text-xs text-gray-400">
+                      Auto radijus izračunat na osnovu prosečne distance između {mapLocations.length} lokacija
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
             {/* Locations list */}
             <button
@@ -666,7 +771,7 @@ export function MapPage() {
               onLocationOpenDetail={loc => openEntityDetail({ type: 'location', data: loc })}
               baseMap={baseMap}
             >
-              <HeatmapLayer locations={displayedLocations} visible={showHeatmap} />
+              <HeatmapLayer locations={displayedLocations} visible={showHeatmap} options={heatmapOptions} />
               <RouteLayer
                 visible={showRoutes}
                 refreshTrigger={routeRefresh}
