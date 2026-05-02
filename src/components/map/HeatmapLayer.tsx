@@ -85,11 +85,11 @@ export function HeatmapLayer({ locations, visible, options }: HeatmapLayerProps)
       maxZoom: 17,
       max: 1.0,
       gradient: {
-        0.2: '#22c55e',
-        0.4: '#84cc16',
-        0.6: '#eab308',
-        0.8: '#f97316',
-        1.0: '#ef4444',
+        0.2: '#e9d5ff',
+        0.4: '#c084fc',
+        0.6: '#a855f7',
+        0.8: '#7c3aed',
+        1.0: '#4c1d95',
       },
     });
 
