@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { getLocations, hardDeleteLocation, resetAllLocations } from '../../lib/api/locations';
 import { useAuth } from '../../contexts/AuthContext';
-import { useMap } from '../../contexts/MapContext';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { Modal } from '../common/Modal';
 import type { Location } from '../../types';
@@ -12,7 +11,6 @@ export function LocationModeration() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
-  const { selectLocation, centerOnLocation } = useMap();
   const [locations, setLocations] = useState<Location[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -52,14 +50,8 @@ export function LocationModeration() {
     }
   };
 
-  const handleEdit = (location: Location) => {
-    selectLocation(location);
-    navigate('/');
-  };
-
   const handleViewOnMap = (location: Location) => {
-    centerOnLocation(location.latitude, location.longitude, 15);
-    navigate('/');
+    navigate(`/?location=${location.id}`);
   };
 
   const handleResetMap = async () => {
@@ -201,15 +193,6 @@ export function LocationModeration() {
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                        </svg>
-                      </button>
-                      <button
-                        onClick={() => handleEdit(location)}
-                        className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                        title={t('admin.editLocation')}
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                       </button>
                       <button
