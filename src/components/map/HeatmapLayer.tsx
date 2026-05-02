@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet.heat';
@@ -11,19 +11,33 @@ interface HeatmapLayerProps {
 
 export function HeatmapLayer({ locations, visible }: HeatmapLayerProps) {
   const map = useMap();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const heatRef = useRef<any>(null);
 
   useEffect(() => {
-    if (!visible || locations.length === 0) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const heatFn = (L as any).heatLayer;
+    if (!heatFn) return;
 
-    const points: L.HeatLatLngTuple[] = locations.map(loc => [
-      loc.latitude,
-      loc.longitude,
-      0.8, // intensity
-    ]);
+    if (!visible) {
+      if (heatRef.current) {
+        map.removeLayer(heatRef.current);
+        heatRef.current = null;
+      }
+      return;
+    }
 
-    const heat = (L as unknown as { heatLayer: (latlngs: L.HeatLatLngTuple[], options?: L.HeatMapOptions) => L.Layer }).heatLayer(points, {
-      radius: 30,
-      blur: 20,
+    if (locations.length === 0) return;
+
+    const points = locations.map(loc => [loc.latitude, loc.longitude, 0.8]);
+
+    if (heatRef.current) {
+      map.removeLayer(heatRef.current);
+    }
+
+    heatRef.current = heatFn(points, {
+      radius: 35,
+      blur: 25,
       maxZoom: 17,
       max: 1.0,
       gradient: {
@@ -35,10 +49,13 @@ export function HeatmapLayer({ locations, visible }: HeatmapLayerProps) {
       },
     });
 
-    heat.addTo(map);
+    heatRef.current.addTo(map);
 
     return () => {
-      map.removeLayer(heat);
+      if (heatRef.current) {
+        map.removeLayer(heatRef.current);
+        heatRef.current = null;
+      }
     };
   }, [map, locations, visible]);
 

@@ -10,8 +10,14 @@ export default defineConfig({
       '@': '/src',
     },
   },
+  optimizeDeps: {
+    include: ['leaflet.heat'],
+  },
   build: {
     outDir: 'dist',
     sourcemap: true,
+    commonjsOptions: {
+      include: [/leaflet\.heat/, /node_modules/],
+    },
   },
 })
