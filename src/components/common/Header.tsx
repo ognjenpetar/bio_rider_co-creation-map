@@ -20,7 +20,7 @@ export function Header() {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
+    <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-[1100]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -99,10 +99,10 @@ export function Header() {
               {isMenuOpen && (
                 <>
                   <div
-                    className="fixed inset-0 z-10"
+                    className="fixed inset-0 z-[1150]"
                     onClick={() => setIsMenuOpen(false)}
                   />
-                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-[1200]">
                     <div className="px-4 py-3 border-b border-gray-100">
                       <p className="text-sm font-medium text-gray-900">
                         {t('auth.loggedInAs')}
