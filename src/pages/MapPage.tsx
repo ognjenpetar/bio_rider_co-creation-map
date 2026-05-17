@@ -880,8 +880,9 @@ export function MapPage() {
               <img src={`${import.meta.env.BASE_URL}logos/bio-rider-logo.svg`} alt="Bio Rider" className="h-10" />
             </div>
             <div className="flex items-center gap-6">
-              <img src={`${import.meta.env.BASE_URL}logos/green-mobility-logo.jpeg`} alt="Green Mobility" className="h-8 object-contain" />
               <img src={`${import.meta.env.BASE_URL}logos/eit-logo.png`} alt="EIT Co-funded" className="h-8 object-contain" />
+              <img src={`${import.meta.env.BASE_URL}logos/RRA%20Zlatibor%20NOVI%20LOGO%20-%20ENG%20HB.png`} alt="RRA Zlatibor" className="h-8 object-contain" />
+              <img src={`${import.meta.env.BASE_URL}logos/green-mobility-logo.jpeg`} alt="Green Mobility" className="h-8 object-contain" />
               <img src={`${import.meta.env.BASE_URL}logos/IAUS%20logo_tanki%20ram_cb.jpg`} alt="IAUS" className="h-8 object-contain" />
             </div>
           </div>
