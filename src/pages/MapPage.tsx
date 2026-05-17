@@ -882,6 +882,7 @@ export function MapPage() {
             <div className="flex items-center gap-6">
               <img src={`${import.meta.env.BASE_URL}logos/green-mobility-logo.jpeg`} alt="Green Mobility" className="h-8 object-contain" />
               <img src={`${import.meta.env.BASE_URL}logos/eit-logo.png`} alt="EIT Co-funded" className="h-8 object-contain" />
+              <img src={`${import.meta.env.BASE_URL}logos/IAUS%20logo_tanki%20ram_cb.jpg`} alt="IAUS" className="h-8 object-contain" />
             </div>
           </div>
         </footer>
