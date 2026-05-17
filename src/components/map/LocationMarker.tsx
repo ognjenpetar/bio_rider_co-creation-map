@@ -84,7 +84,7 @@ export function LocationMarker({
     }
 
     const isPopular = (location.votes_up ?? 0) - (location.votes_down ?? 0) >= 5;
-    return createCustomIcon({ isNew, isPopular, creatorInitial });
+    return createCustomIcon({ isNew, isPopular });
   }, [location.created_at, location.created_by, location.votes_up, location.votes_down, isSelected, isHovered, isDimmed]);
 
   const position: [number, number] = [location.latitude, location.longitude];

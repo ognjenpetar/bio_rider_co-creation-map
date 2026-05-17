@@ -21,6 +21,7 @@ import { getRouteImages, getRouteDocuments, uploadRouteImages, uploadRouteDocume
 import { getZoneImages, getZoneDocuments, uploadZoneImages, uploadZoneDocuments, deleteZoneImage, deleteZoneDocument, type ZoneImage, type ZoneDocument } from '../../lib/api/zoneMedia';
 
 import { StarRating } from './StarRating';
+import { CommentSkeletonList } from './SkeletonLoader';
 import { DeliberationPanel } from './DeliberationPanel';
 import type { Location, Route, Zone, LocationImage, LocationDocument } from '../../types';
 
@@ -550,7 +551,11 @@ export function EntityDetailModal({ entity, onClose, onDeleted, onUpdated }: Ent
         style={{ maxHeight: '85vh' }}
       >
         {/* ── Header ── */}
-        <div className="flex-shrink-0 px-6 pt-5 pb-4">
+        <div className={`flex-shrink-0 px-6 pt-5 pb-4 ${
+          typeInfo.color === 'green' ? 'bg-gradient-to-br from-green-50 to-white' :
+          typeInfo.color === 'blue' ? 'bg-gradient-to-br from-blue-50 to-white' :
+          'bg-gradient-to-br from-purple-50 to-white'
+        }`}>
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1.5">
@@ -968,7 +973,7 @@ export function EntityDetailModal({ entity, onClose, onDeleted, onUpdated }: Ent
                 {/* Comment list */}
                 <div className="flex-1 px-6 py-4">
                   {commentsLoading ? (
-                    <p className="text-center text-gray-400 text-sm py-10">{t('common.loading')}</p>
+                    <CommentSkeletonList count={3} />
                   ) : comments.length === 0 ? (
                     <div className="text-center py-10">
                       <div className="text-3xl mb-2">💬</div>

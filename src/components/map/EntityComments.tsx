@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { getRouteComments, addRouteComment, deleteRouteComment } from '../../lib/api/routeComments';
 import { getZoneComments, addZoneComment, deleteZoneComment } from '../../lib/api/zoneComments';
 import { StarRating } from './StarRating';
+import { CommentSkeletonList } from './SkeletonLoader';
 import type { RouteComment, ZoneComment } from '../../types';
 
 type EntityType = 'route' | 'zone';
@@ -122,7 +123,7 @@ export function EntityComments({ entityType, entityId, onClose }: EntityComments
       {/* Comments list */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {isLoading ? (
-          <p className="text-center text-gray-400 text-sm py-4">{t('common.loading')}</p>
+          <CommentSkeletonList count={3} />
         ) : comments.length === 0 ? (
           <p className="text-center text-gray-400 text-sm py-4">{t('comments.noComments')}</p>
         ) : (

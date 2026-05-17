@@ -303,6 +303,9 @@ export function MapPage() {
               )}
             </div>
 
+            {/* separator */}
+            <div className="w-px h-6 bg-gray-200 hidden sm:block flex-shrink-0" />
+
             {/* Heatmap toggle + settings */}
             <div className="relative">
               <div className="flex items-center">
@@ -428,6 +431,9 @@ export function MapPage() {
               <span className="hidden sm:inline">{t('map.viewAllLocations')}</span>
             </button>
 
+            {/* separator */}
+            <div className="w-px h-6 bg-gray-200 hidden sm:block flex-shrink-0" />
+
             {/* ─── Draw Route (dedicated button) ─── */}
             <button
               onClick={isCreatingRoute ? handleCancelRoute : handleStartRouteCreation}
@@ -463,6 +469,9 @@ export function MapPage() {
                 {isCreatingZone ? t('common.cancel') : t('zones.draw')}
               </span>
             </button>
+
+            {/* separator */}
+            <div className="w-px h-6 bg-gray-200 hidden sm:block flex-shrink-0" />
 
             {/* Layers menu */}
             <div className="relative" data-tour="layers">
@@ -567,6 +576,9 @@ export function MapPage() {
               )}
               <span className="hidden sm:inline">{baseMap === 'osm' ? t('map.satellite') : t('map.osm')}</span>
             </button>
+
+            {/* separator */}
+            <div className="w-px h-6 bg-gray-200 hidden sm:block flex-shrink-0" />
 
             {/* Export */}
             <div className="relative" data-tour="export">
@@ -879,11 +891,11 @@ export function MapPage() {
             <div className="flex items-center gap-4">
               <img src={`${import.meta.env.BASE_URL}logos/bio-rider-logo.svg`} alt="Bio Rider" className="h-10" />
             </div>
-            <div className="flex items-center gap-6">
-              <img src={`${import.meta.env.BASE_URL}logos/eit-logo.png`} alt="EIT Co-funded" className="h-8 object-contain" />
-              <img src={`${import.meta.env.BASE_URL}logos/RRA%20Zlatibor%20NOVI%20LOGO%20-%20ENG%20HB.png`} alt="RRA Zlatibor" className="h-8 object-contain" />
-              <img src={`${import.meta.env.BASE_URL}logos/green-mobility-logo.jpeg`} alt="Green Mobility" className="h-8 object-contain" />
-              <img src={`${import.meta.env.BASE_URL}logos/IAUS%20logo_tanki%20ram_cb.jpg`} alt="IAUS" className="h-8 object-contain" />
+            <div className="flex items-center divide-x divide-gray-200">
+              <img src={`${import.meta.env.BASE_URL}logos/eit-logo.png`} alt="EIT Co-funded" className="h-8 object-contain px-6 grayscale hover:grayscale-0 transition-all duration-300" />
+              <img src={`${import.meta.env.BASE_URL}logos/RRA%20Zlatibor%20NOVI%20LOGO%20-%20ENG%20HB.png`} alt="RRA Zlatibor" className="h-8 object-contain px-6 grayscale hover:grayscale-0 transition-all duration-300" />
+              <img src={`${import.meta.env.BASE_URL}logos/green-mobility-logo.jpeg`} alt="Green Mobility" className="h-8 object-contain px-6 grayscale hover:grayscale-0 transition-all duration-300" />
+              <img src={`${import.meta.env.BASE_URL}logos/IAUS%20logo_tanki%20ram_cb.jpg`} alt="IAUS" className="h-8 object-contain px-6 grayscale hover:grayscale-0 transition-all duration-300" />
             </div>
           </div>
         </footer>

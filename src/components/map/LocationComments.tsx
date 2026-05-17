@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 import { getComments, addComment, deleteComment, getCommentImageUrl } from '../../lib/api/comments';
 import { StarRating } from './StarRating';
+import { CommentSkeletonList } from './SkeletonLoader';
 import type { LocationComment } from '../../types';
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -123,7 +124,7 @@ export function LocationComments({ locationId, onClose }: LocationCommentsProps)
       {/* Comments list */}
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {isLoading ? (
-          <p className="text-center text-gray-400 text-sm py-4">{t('common.loading')}</p>
+          <CommentSkeletonList count={3} />
         ) : comments.length === 0 ? (
           <p className="text-center text-gray-400 text-sm py-4">{t('comments.noComments')}</p>
         ) : (
