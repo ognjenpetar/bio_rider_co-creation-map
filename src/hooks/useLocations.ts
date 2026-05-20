@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { getLocations, createLocation, updateLocation as updateLocationApi, deleteLocation } from '../lib/api/locations';
 import { useMap } from '../contexts/MapContext';
+import { supabase } from '../lib/supabase';
 import type { Location } from '../types';
 
 interface UseLocationsReturn {
@@ -25,23 +26,43 @@ export function useLocations(): UseLocationsReturn {
   const [localLocations, setLocalLocations] = useState<Location[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const isMounted = useRef(true);
 
   const fetchLocations = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
+      // Clear immediately so stale data doesn't persist while fetching
+      setLocalLocations([]);
+      setLocations([]);
       const data = await getLocations();
+      if (!isMounted.current) return;
       setLocalLocations(data);
       setLocations(data);
     } catch (err) {
+      if (!isMounted.current) return;
       setError(err instanceof Error ? err : new Error('Failed to fetch locations'));
     } finally {
-      setIsLoading(false);
+      if (isMounted.current) setIsLoading(false);
     }
   }, [setLocations]);
 
   useEffect(() => {
+    isMounted.current = true;
     fetchLocations();
+
+    // Realtime subscription — re-fetch whenever locations table changes
+    const channel = supabase
+      .channel('locations-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'locations' }, () => {
+        if (isMounted.current) fetchLocations();
+      })
+      .subscribe();
+
+    return () => {
+      isMounted.current = false;
+      supabase.removeChannel(channel);
+    };
   }, [fetchLocations]);
 
   const addLocation = useCallback(
