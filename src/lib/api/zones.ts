@@ -78,3 +78,12 @@ export async function deleteZone(id: string): Promise<void> {
 
   if (error) throw error;
 }
+
+export async function resetAllZones(): Promise<void> {
+  const { error } = await supabase
+    .from('zones')
+    .delete()
+    .neq('id', '00000000-0000-0000-0000-000000000000'); // delete all rows
+
+  if (error) throw error;
+}

@@ -81,3 +81,12 @@ export async function deleteRoute(id: string): Promise<void> {
 
   if (error) throw error;
 }
+
+export async function resetAllRoutes(): Promise<void> {
+  const { error } = await supabase
+    .from('routes')
+    .delete()
+    .neq('id', '00000000-0000-0000-0000-000000000000'); // delete all rows
+
+  if (error) throw error;
+}
