@@ -22,6 +22,7 @@ import { createRoute, getRoutes } from '../lib/api/routes';
 import { createZone, getZones } from '../lib/api/zones';
 import { getBasicStats, type BasicStats } from '../lib/api/stats';
 import { EntityDetailModal, type SelectedEntity } from '../components/map/EntityDetailModal';
+import { ImportModal } from '../components/map/ImportModal';
 import { calcAutoRadius, type HeatmapOptions } from '../components/map/HeatmapLayer';
 import type { Location, LocationFormData, Coordinates, ZoneType } from '../types';
 
@@ -60,6 +61,7 @@ export function MapPage() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [showLocationsList, setShowLocationsList] = useState(false);
   const [showExportMenu, setShowExportMenu] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
 
   // Layer states — default routes & zones to ON so saved data is always visible
   const [showHeatmap, setShowHeatmap] = useState(false);
@@ -596,6 +598,20 @@ export function MapPage() {
             {/* separator */}
             <div className="w-px h-6 bg-gray-200 hidden sm:block flex-shrink-0" />
 
+            {/* Import */}
+            {user && (
+              <button
+                onClick={() => setShowImportModal(true)}
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg bg-gray-100 text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors"
+                title="Uvezi geometriju (GeoJSON, GPX, DXF)"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                <span className="hidden sm:inline">Uvezi</span>
+              </button>
+            )}
+
             {/* Export */}
             <div className="relative" data-tour="export">
               <button
@@ -1040,6 +1056,20 @@ export function MapPage() {
               </div>
             </motion.div>
           </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Import modal */}
+      <AnimatePresence>
+        {showImportModal && user && (
+          <ImportModal
+            username={user.username}
+            onClose={() => setShowImportModal(false)}
+            onImported={() => {
+              setRouteRefresh(n => n + 1);
+              setZoneRefresh(n => n + 1);
+            }}
+          />
         )}
       </AnimatePresence>
 
