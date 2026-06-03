@@ -14,6 +14,9 @@ export interface Location {
   is_active: boolean;
   votes_up: number;
   votes_down: number;
+  category: string;
+  icon: string | null;
+  color: string | null;
 }
 
 // Comment/rating type
@@ -79,6 +82,9 @@ export interface LocationFormData {
   description_sr?: string;
   latitude: number;
   longitude: number;
+  category?: string;
+  icon?: string;
+  color?: string;
   images?: File[];
   documents?: File[];
 }
@@ -132,6 +138,7 @@ export interface Route {
   distance_km: number | null;
   estimated_time_min: number | null;
   route_type: 'cycling' | 'walking' | 'hiking' | 'biotop' | 'other';
+  route_types: string[];
   is_active: boolean;
   votes_up: number;
   votes_down: number;

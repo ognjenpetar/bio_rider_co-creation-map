@@ -10,7 +10,7 @@ export async function getLocations(): Promise<Location[]> {
     .order('created_at', { ascending: false });
 
   if (error) throw error;
-  return data || [];
+  return (data || []) as unknown as Location[];
 }
 
 // Fetch single location by ID
@@ -25,7 +25,7 @@ export async function getLocation(id: string): Promise<Location | null> {
     if (error.code === 'PGRST116') return null; // Not found
     throw error;
   }
-  return data;
+  return data as unknown as Location;
 }
 
 // Fetch location with all related files
@@ -62,7 +62,10 @@ export async function createLocation(
     description_en?: string;
     latitude: number;
     longitude: number;
-    created_by: string; // Username of the creator
+    created_by: string;
+    category?: string;
+    icon?: string;
+    color?: string;
   },
   images?: File[],
   documents?: File[]
@@ -78,6 +81,9 @@ export async function createLocation(
       latitude: data.latitude,
       longitude: data.longitude,
       created_by: data.created_by,
+      category: data.category || 'other',
+      icon: data.icon || null,
+      color: data.color || null,
     })
     .select()
     .single();
@@ -101,7 +107,7 @@ export async function createLocation(
     await uploadLocationDocuments(location.id, documents);
   }
 
-  return location;
+  return location as unknown as Location;
 }
 
 // Update location
@@ -115,6 +121,9 @@ export async function updateLocation(
     latitude?: number;
     longitude?: number;
     preview_image_url?: string;
+    category?: string;
+    icon?: string;
+    color?: string;
   }
 ): Promise<Location> {
   const { data: location, error } = await supabase
@@ -125,7 +134,7 @@ export async function updateLocation(
     .single();
 
   if (error) throw error;
-  return location;
+  return location as unknown as Location;
 }
 
 // Delete location (soft delete - set is_active to false)

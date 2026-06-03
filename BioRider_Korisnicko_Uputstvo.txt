@@ -1,0 +1,863 @@
+========================================================================
+BIO RIDER KO-KREACIJSKA MAPA
+Korisničko uputstvo — kompletni vodič za korišćenje platforme
+========================================================================
+
+
+SADRŽAJ
+------------------------------------------------------------------------
+  1.  Uvod i pristup platformi
+  2.  Prijava i korisnički nalog
+  3.  Pregled mape i osnovne kontrole
+  4.  Slojevi mape (lokacije, rute, zone)
+  5.  Dodavanje lokacije
+  6.  Pregled detalja lokacije
+  7.  Komentari i ocenjivanje
+  8.  Glasanje (palac gore / palac dole)
+  9.  Diskusija (deliberacija)
+  10. Crtanje ruta
+  11. Crtanje zona (poligona)
+  12. Pretraga
+  13. Prikaz svih stavki (lista)
+  14. Heatmapa
+  15. Vremenska mašina
+  16. Promena podloge mape
+  17. Izvoz podataka (CSV, GeoJSON, PDF)
+  18. Deljenje linka lokacije
+  19. Uređivanje i brisanje sadržaja
+  20. Admin panel
+  21. Česta pitanja i rešavanje problema
+
+
+========================================================================
+1. UVOD I PRISTUP PLATFORMI
+========================================================================
+
+Bio Rider Ko-kreacijska Mapa je digitalna platforma za participativno
+i ko-kreativno prostorno mapiranje. Omogućava svim zainteresovanim
+građanima, stručnjacima i organizacijama da zajedno oblikuju mobilnost
+i javni prostor postavljanjem lokacija, crtanjem ruta i zona, glasanjem
+i komentarisanjem.
+
+Platforma ne zahteva instalaciju softvera. Dovoljno je otvoriti
+pretraživač na računaru, tabletu ili mobilnom telefonu i uneti adresu:
+
+    https://ognjenpetar.github.io/bio_rider_co-creation-map/
+
+Preporučeni pretraživači: Google Chrome, Mozilla Firefox, Microsoft Edge,
+Safari. Platforma radi na svim modernim uređajima.
+
+
+========================================================================
+2. PRIJAVA I KORISNIČKI NALOG
+========================================================================
+
+REGISTRACIJA NIJE OBAVEZNA ZA PREGLEDANJE MAPE.
+Prijava je potrebna samo za dodavanje sadržaja (lokacije, rute, zone,
+komentari, glasovi).
+
+KAKO SE PRIJAVITI
+-----------------
+1. Kliknite na dugme "Prijava" u gornjem desnom uglu ekrana.
+2. Unesite željeno korisničko ime (npr. "Marko", "urbanista_novi_sad").
+   - Korisničko ime je jedini podatak koji se traži.
+   - Nije potrebna e-pošta ni lozinka.
+3. Kliknite "Prijavi se".
+4. Vaše korisničko ime biće prikazano u zaglavlju aplikacije.
+
+NAPOMENA O KORISNIČKOM IMENU
+-----------------------------
+- Odaberite prepoznatljivo ime jer će ono biti vidljivo uz sve vaše
+  doprinose (lokacije, komentari, glasovi).
+- Korisničko ime je trajno vezano za vaš sadržaj — čuvajte ga.
+- Platforma ne čuva lozinku; ako promenite uređaj, prijavite se
+  istim korisničkim imenom.
+
+ODJAVA
+------
+Kliknite na svoje korisničko ime u zaglavlju, pa na "Odjavi se".
+
+
+========================================================================
+3. PREGLED MAPE I OSNOVNE KONTROLE
+========================================================================
+
+Nakon otvaranja platforme vidite interaktivnu mapu sa sledećim
+elementima:
+
+NAVIGACIJA PO MAPI
+------------------
+- Prevlačenje mišem (ili prstom na ekranu osetljivom na dodir):
+  pomera mapu u svim pravcima.
+- Točkić miša (ili štipanje dva prsta): zumiranje i odmicanje.
+- Dvostruki klik: zumira određenu tačku.
+- Dugmad "+" i "−" u gornjem levom uglu mape: kontrolišu zum.
+
+MARKERI (PINOVI) NA MAPI
+-------------------------
+Svaka lokacija prikazana je kao pin (teardrop oblika) na mapi.
+Boja i ikona pina govore nešto o lokaciji:
+
+  Zeleni pin    — standardna lokacija
+  Tirkizni pin  — popularna lokacija (5+ glasova podrške)
+  Zlatni pin    — visoko ocenjena lokacija (prosek 4.5+)
+  Pin sa bedžom — verifikovana lokacija
+
+Klik na pin otvara detaljni panel te lokacije.
+
+TOOLBAR (ALATNA TRAKA)
+----------------------
+Nalazi se na vrhu ekrana, ispod zaglavlja. Sadrži sledeće grupe:
+
+  [ Pretraga ]
+  ─────────────────
+  [ Heatmapa ] [ Prikaz stavki ]
+  ─────────────────
+  [ Nacrtaj rutu ] [ Nacrtaj zonu ]
+  ─────────────────
+  [ Slojevi ] [ Satelit/Mapa ] [ Vremenska mašina ]
+  ─────────────────
+  [ Izvoz ] [ Dodaj lokaciju ]
+
+
+========================================================================
+4. SLOJEVI MAPE
+========================================================================
+
+Mapa podržava više slojeva koji se mogu uključivati i isključivati.
+
+KAKO UPRAVLJATI SLOJEVIMA
+--------------------------
+Kliknite na dugme "Slojevi" u alatnoj traci. Otvoriće se meni sa
+sledećim opcijama:
+
+  ☑ Heatmapa     — toplotna mapa gustine lokacija
+  ☑ Rute         — prikazuje nacrtane rute na mapi
+  ☑ Zone         — prikazuje nacrtane zone (poligone) na mapi
+
+Kliknite na checkbox pored svakog sloja da ga uključite ili isključite.
+Promene su trenutne — sloj nestaje ili se pojavljuje bez učitavanja.
+
+Rute i zone su podrazumevano uključene kada otvorite platformu.
+
+
+========================================================================
+5. DODAVANJE LOKACIJE
+========================================================================
+
+Lokacije su osnovni element mape — tačke od interesa koje postavljaju
+korisnici.
+
+PREDUSLOVI
+----------
+Morate biti prijavljeni da biste dodali lokaciju.
+
+KORACI
+------
+1. Kliknite na dugme "Dodaj lokaciju" (zeleno, u desnom delu toolbar-a).
+   Kursor će se promeniti u znak "+" — ovo je mod dodavanja.
+
+2. Kliknite na deo mape gde želite da postavite lokaciju.
+   Otvoriće se forma za unos podataka.
+
+3. Popunite formu:
+
+   NAZIV (obavezno)
+   Kratko i jasno ime lokacije.
+   Primer: "Opasna raskrsnica kod pošte", "Predlog bike-sharing stanice"
+
+   OPIS — SRPSKI
+   Opišite lokaciju, problem ili predlog na srpskom jeziku.
+
+   OPIS — ENGLESKI
+   Opcionalni prevod opisa na engleski.
+
+   FOTOGRAFIJE
+   Kliknite "Dodaj fotografije" da uploadujete slike sa vašeg uređaja.
+   - Podržani formati: JPG, PNG, GIF, WebP
+   - Maksimalna veličina: 5 MB po fotografiji
+   - Možete dodati više fotografija odjednom.
+   - Fotografije će biti vidljive svim korisnicima.
+
+   DOKUMENTI
+   Možete priložiti PDF ili Word dokumente uz lokaciju.
+   Korisno za tehničku dokumentaciju, studije, planove.
+
+4. Kliknite "Sačuvaj" — lokacija se odmah pojavljuje na mapi i
+   vidljiva je svim korisnicima u realnom vremenu.
+
+   Kliknite "Otkaži" da odustanete od dodavanja.
+
+NAPOMENE
+--------
+- Lokacija je odmah javno vidljiva bez moderacije.
+- Uz lokaciju se automatski čuva ko ju je kreirao i kada.
+- Možete dodati neograničen broj lokacija.
+
+
+========================================================================
+6. PREGLED DETALJA LOKACIJE
+========================================================================
+
+Kliknite na bilo koji pin na mapi da otvorite panel sa detaljima.
+
+PANEL DETALJA
+-------------
+Otvara se modalni prozor sa sledećim sadržajem:
+
+  ZAGLAVLJE
+  - Naziv lokacije
+  - Tip (Lokacija / Ruta / Zona)
+  - Prosečna ocena (zvezdice)
+  - Neto glasovi (broj glasova za minus broj glasova protiv)
+  - Kreator i datum kreiranja
+
+  TABOVI (kartice)
+  ----------------
+  Panel ima četiri kartice koje možete prebacivati:
+
+  [ Info ] [ Glasanje ] [ Komentari ] [ Diskusija ]
+
+  INFO KARTICA
+  Prikazuje:
+  - Opis lokacije (na srpskom ili engleskom, zavisno od jezičkih
+    podešavanja)
+  - Galeriju fotografija (klik na fotografiju otvara je u punoj veličini)
+  - Priložene dokumente (klik preuzima fajl)
+  - Dugme "Prikaži na mapi" (centrira mapu na lokaciju)
+  - Za admin i kreatora: dugmad "Uredi" i "Obriši"
+
+  GLASANJE KARTICA
+  Glasanje palac gore / palac dole. Detalji u sekciji 8.
+
+  KOMENTARI KARTICA
+  Komentari i ocene korisnika. Detalji u sekciji 7.
+
+  DISKUSIJA KARTICA (samo za lokacije)
+  Strukturisana deliberacija. Detalji u sekciji 9.
+
+
+========================================================================
+7. KOMENTARI I OCENJIVANJE
+========================================================================
+
+Svaka lokacija, ruta i zona može biti ocenjena i komentarisana.
+
+PREGLED KOMENTARA
+-----------------
+Otvorite panel detalja neke stavke i kliknite na karticu "Komentari".
+Videćete:
+- Prosečnu ocenu (zvezdice) i ukupan broj komentara u zaglavlju
+- Listu svih komentara sa: imenom korisnika, ocenom, datumom,
+  tekstom komentara i eventualno priloženom fotografijom
+
+OSTAVLJANJE KOMENTARA
+---------------------
+Morate biti prijavljeni.
+
+1. U dnu panela komentara vidite formu.
+2. OCENA je obavezna — kliknite na jednu od 5 zvezdica da ocenite.
+   (1 zvezda = najlošije, 5 zvezda = odlično)
+   Zvezdice su označene crvenom zvezdicom "*" kao obavezno polje.
+3. KOMENTAR je opcioni — unesite tekst u polje za unos.
+4. FOTOGRAFIJA (samo za lokacije) — kliknite ikonu fotoaparata da
+   priložite sliku uz komentar (max 5 MB).
+5. Kliknite "Pošalji".
+
+Komentar se odmah pojavljuje u listi.
+
+BRISANJE KOMENTARA
+------------------
+Možete obrisati samo svoje komentare. Admin može brisati sve komentare.
+Kliknite na "Obriši" pored komentara.
+
+NAPOMENA
+--------
+Ocena je obavezna — bez nje komentar ne može biti poslat. Sistem će
+prikazati upozorenje ako pokušate da pošaljete bez ocene.
+
+
+========================================================================
+8. GLASANJE (PALAC GORE / PALAC DOLE)
+========================================================================
+
+Glasanje je brz mehanizam za izražavanje stava o lokaciji, ruti ili
+zoni — bez potrebe za komentarom.
+
+KAKO GLASATI
+------------
+1. Otvorite panel detalja stavke.
+2. Kliknite na karticu "Glasanje".
+3. Kliknite:
+   👍 Palac gore  — podržavate ovaj sadržaj / slažete se
+   👎 Palac dole  — ne podržavate / ne slažete se
+
+PRAVILA GLASANJA
+----------------
+- Jedan korisnik može dati samo jedan glas po stavci.
+- Možete promeniti glas: kliknite na suprotnu opciju.
+- Možete povući glas: kliknite ponovo na istu opciju.
+- Morate biti prijavljeni.
+
+PRIKAZ REZULTATA
+----------------
+Panel glasanja prikazuje:
+- Ukupan broj glasova "za" (zeleno)
+- Ukupan broj glasova "protiv" (crveno)
+- Neto rezultat (za minus protiv)
+- Vaš trenutni glas je istaknut
+
+Neto rezultat se prikazuje i u zaglavlju detalja stavke, uz naziv.
+
+
+========================================================================
+9. DISKUSIJA (DELIBERACIJA)
+========================================================================
+
+Diskusija je dostupna samo za LOKACIJE. To je prostor za strukturisanu,
+argumentovanu razmenu stavova o specifičnoj temi vezanoj za tu lokaciju.
+
+Razlikuje se od komentara: dok su komentari kratki i subjektivni,
+deliberacija poziva na argumentovani dijalog.
+
+PREGLED DISKUSIJE
+-----------------
+Otvorite panel detalja lokacije → kartica "Diskusija".
+
+Videćete aktivne diskusije (deliberacije) vezane za tu lokaciju, ako ih ima.
+Svaka deliberacija ima:
+- Naslov i opis teme
+- Fazu diskusije: Identifikacija → Predlozi → Argumentacija →
+                  Konsenzus → Zatvoreno
+- Unose učesnika (argumenti za, argumenti protiv, predlozi, konsenzusi)
+
+UČESTVOVANJE U DISKUSIJI
+------------------------
+Morate biti prijavljeni.
+
+1. Otvorite diskusiju klikom na njen naslov.
+2. Izaberite tip unosa:
+   - Identifikacija problema
+   - Predlog rešenja
+   - Argument za
+   - Argument protiv
+   - Konsenzus
+   - Komentar
+3. Unesite tekst.
+4. Kliknite "Pošalji".
+
+Na unosima možete glasati (👍/👎) da izrazite slaganje ili neslaganje
+sa argumentima.
+
+
+========================================================================
+10. CRTANJE RUTA
+========================================================================
+
+Rute su linije na mapi koje prikazuju putanje — biciklističke staze,
+pešačke rute, planinske ture, biotop koridore i sl.
+
+KAKO NACRTATI RUTU
+------------------
+Morate biti prijavljeni.
+
+1. Kliknite dugme "Nacrtaj rutu" u toolbar-u (ikona mape sa linijom).
+   Dugme će promeniti boju — aktiviran je mod crtanja rute.
+
+2. Klikovima na mapi postavljajte tačke rute.
+   - Svaki klik dodaje novu tačku.
+   - Linija se automatski crta između tačaka.
+   - Na ekranu se prikazuju: trenutna dužina rute (km) i procenjeno
+     vreme hoda/vožnje.
+
+3. Kada završite sa postavljanjem tačaka, kliknite dugme "Sačuvaj rutu"
+   koje se pojavljuje na ekranu. Otvoriće se forma:
+
+   IME RUTE (obavezno)
+   Unesite naziv rute. Primer: "Ruta duž reke Zlatice"
+
+   TIP RUTE (obavezno)
+   Izaberite jedan od ponuđenih tipova:
+   - Biciklistička
+   - Pešačka
+   - Planinska
+   - Biotop
+   - Ostalo
+
+   OPIS (opciono)
+   Tekstualni opis rute.
+
+   BOJA LINIJE
+   Možete izabrati boju kojom će ruta biti prikazana na mapi.
+
+4. Kliknite "Sačuvaj" — ruta se odmah pojavljuje na mapi.
+   Kliknite "Otkaži crtanje" da odustanete.
+
+PREGLED I DETALJI RUTE
+-----------------------
+Kliknite na liniju rute na mapi. Otvoriće se panel detalja sa:
+- Imenom i tipom rute
+- Dužinom (km) i procenjenim vremenom
+- Brojem tačaka rute
+- Kreatorom i datumom
+- Tabovima: Info / Glasanje / Komentari
+
+NAPOMENE
+--------
+- Ruta mora imati najmanje 2 tačke.
+- Dužina se automatski izračunava Haversine formulom.
+- Procenjeno vreme se izračunava na osnovu prosečne brzine:
+  bicikl ~15 km/h, pešačenje ~5 km/h.
+
+
+========================================================================
+11. CRTANJE ZONA (POLIGONA)
+========================================================================
+
+Zone su površine na mapi — poligoni koji označavaju određena područja:
+parkove, biciklističke zone, zaštićena područja, problematične četvrti itd.
+
+KAKO NACRTATI ZONU
+------------------
+Morate biti prijavljeni.
+
+1. Kliknite dugme "Nacrtaj zonu" u toolbar-u (ikona kvadrata).
+   Aktiviran je mod crtanja zone.
+
+2. Klikovima na mapi postavljajte temena (uglove) zone.
+   - Svaki klik dodaje novo teme.
+   - Potrebna su najmanje 3 temena da biste formirali poligon.
+   - Zona se automatski zatavara (poslednje teme se spaja sa prvim).
+
+3. Kada postavite sva temena, kliknite "Sačuvaj zonu".
+   Otvoriće se forma:
+
+   IME ZONE (obavezno)
+   Primer: "Predlog parka između zgrada", "Opasna zona za bicikle"
+
+   TIP ZONE (obavezno)
+   - Park
+   - Biciklistička zona
+   - Restriktivna zona
+   - Rezidencijalna
+   - Komercijalna
+   - Biotop
+   - Ostalo
+
+   OPIS (opciono)
+   Tekstualni opis zone.
+
+   BOJA IVICE I ISPUNE
+   Možete prilagoditi boje poligona.
+
+4. Kliknite "Sačuvaj".
+
+PREGLED I DETALJI ZONE
+-----------------------
+Kliknite unutar zone na mapi. Otvoriće se panel detalja sa:
+- Imenom i tipom zone
+- Brojem temena
+- Kreatorom i datumom
+- Tabovima: Info / Glasanje / Komentari
+
+
+========================================================================
+12. PRETRAGA
+========================================================================
+
+Platforma ima integrisanu pretragu za brzo pronalaženje sadržaja.
+
+KAKO KORISTITI PRETRAGU
+------------------------
+1. Kliknite u polje pretrage u levom delu toolbar-a (ikona lupe).
+2. Počnite da kucate — rezultati se pojavljuju u realnom vremenu.
+3. Pretraga pokriva: nazive lokacija, opise, nazive ruta i zona.
+4. Kliknite na rezultat — mapa se automatski centrira na tu stavku.
+5. Kliknite "X" ili dugme "Zatvori" da zatvorite rezultate pretrage.
+
+NAPOMENE
+--------
+- Pretraga je bez dijakritika — možete tražiti i bez šćž.
+- Minimum 1 karakter pokreće pretragu.
+- Rezultati se ažuriraju dok kucate, bez potrebe za pritiskom Enter.
+
+
+========================================================================
+13. PRIKAZ SVIH STAVKI (LISTA)
+========================================================================
+
+Umesto da tražite stavke na mapi, možete ih pregledati kao listu.
+
+KAKO OTVORITI LISTU
+-------------------
+Kliknite dugme "Prikaz stavki" u toolbar-u (ikona sa redovima).
+Otvoriće se bočni panel sa listom svih stavki.
+
+FILTRIRANJE
+-----------
+U zaglavlju liste nalaze se kartice:
+  [ Sve ] [ Lokacije ] [ Rute ] [ Zone ]
+
+Kliknite na karticu da filtrirate po tipu.
+
+Uz svaki tab je prikazan ukupan broj stavki tog tipa.
+
+PREGLED STAVKE IZ LISTE
+-------------------------
+Kliknite na stavku u listi — mapa se centrira na tu stavku.
+Za lokacije: mapa pomerira pin u centar ekrana.
+Za rute i zone: mapa se fituje da prikaže celu rutu/zonu.
+
+Zatvorite listu klikom na "X" u zaglavlju panela, ili klikom
+na dugme "Prikaz stavki" u toolbar-u.
+
+
+========================================================================
+14. HEATMAPA
+========================================================================
+
+Heatmapa je toplotna mapa koja vizualizuje gustinu lokacija na mapi —
+gde su koncentrisane tačke interesa ili problema.
+
+UKLJUČIVANJE HEATMAPE
+----------------------
+Kliknite dugme "Heatmapa" u toolbar-u (ikona plamena).
+Dugme postaje narandžasto kada je heatmapa aktivna.
+
+Na mapi se pojavljuje ljubičasti gradijent — intenzivnija boja znači
+veću gustinu lokacija na tom prostoru.
+
+PODEŠAVANJA HEATMAPE
+---------------------
+Kada je heatmapa uključena, pojavljuje se dugme sa ikonom podešavanja
+pored dugmeta heatmape. Kliknite ga da otvorite panel sa opcijama:
+
+  RADIJUS    — koliko daleko svaka lokacija "širi" toplotu (u pikselima)
+               Niža vrednost = precizniji prikaz
+               Viša vrednost = širi, mekši prikaz
+               Dugme "Auto" automatski izračunava optimalan radijus.
+
+  ZAMUĆENJE  — koliko su granice između toplih i hladnih zona meke
+               Niža vrednost = oštriji prelazi
+               Viša vrednost = mekši prelazi
+
+  INTENZITET — jačina boje heatmape
+               Niža vrednost = bледiji prikaz
+               Viša vrednost = intenzivniji prikaz
+
+Heatmapa se automatski ažurira pri svakoj promeni podešavanja.
+
+UPOTREBA
+--------
+Heatmapa odgovara na pitanje: "Gde su koncentrisane tačke interesa?"
+Korisna je za prioritizaciju intervencija — zona sa visokom gustinom
+zahteva više pažnje planera.
+
+
+========================================================================
+15. VREMENSKA MAŠINA
+========================================================================
+
+Vremenska mašina omogućava praćenje razvoja mape kroz vreme — možete
+videti kako je mapa izgledala u bilo kom trenutku u prošlosti.
+
+POKRETANJE VREMENSKE MAŠINE
+----------------------------
+Kliknite dugme "Vremenska mašina" u toolbar-u (ikona sata).
+Dugme postaje ljubičasto kada je aktivno.
+
+Na dnu mape pojavljuje se klizač (slider) sa opsegom datuma.
+
+KORIŠĆENJE KLIZAČA
+-------------------
+- Klizač prikazuje opseg od prvog dodanog sadržaja do danas.
+- Pomičite klizač ulevo — mapa prikazuje samo sadržaj koji je
+  bio postavljen DO tog datuma.
+- Pomičite klizač udesno — postepeno se otkrivaju noviji elementi.
+- Na klizaču je prikazan trenutno odabrani datum.
+
+Na ovaj način možete vizualizovati kako je mapa rasla tokom projekta:
+od prvih lokacija do celokupnog sadržaja.
+
+ISKLJUČIVANJE
+-------------
+Kliknite ponovo na dugme "Vremenska mašina" u toolbar-u, ili ga
+pronađite u meniju Slojevi i isključite.
+
+NAPOMENA
+--------
+Vremenska mašina filtrira samo lokacije. Rute i zone nisu filtrirane.
+
+
+========================================================================
+16. PROMENA PODLOGE MAPE
+========================================================================
+
+Platforma nudi dve vrste podloge mape.
+
+KAKO PROMENITI PODLOGU
+-----------------------
+Kliknite dugme sa ikonom zemaljske kugle (pored "Slojevi") u toolbar-u.
+
+  OPENSTREETMAP (podrazumevano)
+  Standardna ulična mapa sa putevima, zgradama, parkovima.
+  Pogodna za svakodnevnu upotrebu i crtanje ruta.
+
+  SATELITSKI SNIMAK
+  Satelitska fotografija terena iz vazduha.
+  Korisna za identifikaciju fizičkih karakteristika prostora,
+  zelenila, izgrađenosti, biotopa itd.
+
+Dugme u toolbar-u prikazuje trenutno stanje:
+- "Satelit" — prelazak na satelitski snimak
+- "Mapa"    — prelazak nazad na OpenStreetMap
+
+Promena je trenutna.
+
+
+========================================================================
+17. IZVOZ PODATAKA
+========================================================================
+
+Svi prikupljeni podaci mogu se preuzeti u standardnim formatima.
+
+KAKO IZVESTI PODATKE
+---------------------
+Kliknite dugme "Izvoz" u toolbar-u (ikona strelice prema dole).
+Otvoriće se padajući meni sa opcijama.
+
+DOSTUPNI FORMATI
+----------------
+
+  CSV (.csv)
+  ----------
+  Tabelarni format. Sadrži sve lokacije sa svim atributima:
+  naziv, opis, koordinate, kreator, datum, broj glasova, prosečna ocena.
+  Otvorite u Microsoft Excel, Google Sheets ili LibreOffice Calc.
+  Preuzimanje je trenutno.
+
+  GeoJSON (.geojson)
+  ------------------
+  Standardni GIS format za prostorne podatke. Sadrži:
+  - Sve lokacije kao tačke (Point)
+  - Sve rute kao linije (LineString)
+  - Sve zone kao poligone (Polygon)
+  Sa svim atributima vezanim za svaki element.
+  Uvezite u QGIS, ArcGIS, uMap, Mapbox ili bilo koji GIS alat.
+  Preuzimanje može potrajati nekoliko sekundi jer se preuzimaju
+  i podaci ruta i zona.
+
+  PDF (.pdf)
+  ----------
+  Izveštaj pogodан za štampanje i prezentacije. Sadrži:
+  - Naslov i datum generisanja
+  - Statistike (broj lokacija, ruta, zona, komentara, glasova)
+  - Listu svih lokacija sa opisima i koordinatama
+  Generisanje može potrajati nekoliko sekundi.
+
+NAPOMENA
+--------
+Izvoz je dostupan svim korisnicima (bez prijave).
+Podaci su ažurni u trenutku preuzimanja.
+
+
+========================================================================
+18. DELJENJE LINKA LOKACIJE
+========================================================================
+
+Svaka lokacija ima jedinstveni URL koji možete deliti.
+
+KAKO PODELITI LOKACIJU
+-----------------------
+1. Otvorite panel detalja lokacije klikom na pin.
+2. U Info kartici nađite dugme "Kopiraj link" ili pogledajte URL
+   u pretraživaču koji se automatski ažurira.
+3. Kopirajte URL iz adresne trake pretraživača.
+
+KAKO FUNKCIONIŠE
+-----------------
+URL izgleda ovako:
+  https://ognjenpetar.github.io/bio_rider_co-creation-map/?location=ID
+
+Kada neko otvori taj link:
+- Mapa se automatski centrira na tu lokaciju
+- Panel detalja se automatski otvara
+
+Koristite ovo za:
+- Deljenje lokacije u e-pošti ili poruci
+- Referenciranje u izveštajima
+- Obaveštavanje kolega o specifičnom mestu na mapi
+
+
+========================================================================
+19. UREĐIVANJE I BRISANJE SADRŽAJA
+========================================================================
+
+UREĐIVANJE LOKACIJE
+--------------------
+Možete uređivati samo svoje lokacije (ili sve ako ste admin).
+
+1. Otvorite panel detalja lokacije.
+2. U Info kartici kliknite dugme "Uredi" (ikona olovke).
+3. Izmenite željene podatke: naziv, opis, koordinate.
+4. Kliknite "Sačuvaj izmene".
+
+Napomena: Fotografije i dokumenti se upravljaju posebno:
+- U Edit modu možete dodavati nove fotografije i dokumente.
+- Kliknite "X" pored postojeće fotografije/dokumenta da je obrišete.
+
+BRISANJE LOKACIJE
+-----------------
+Samo admin može trajno obrisati lokaciju.
+Kreator može označiti lokaciju kao neaktivnu (mekano brisanje).
+
+1. Otvorite panel detalja lokacije.
+2. Kliknite dugme "Obriši" (crvena ikona kante).
+3. Potvrdite brisanje u dijalogu.
+
+Brisanje je nepovratno — lokacija, sve njene fotografije, dokumenti,
+komentari i glasovi se trajno brišu.
+
+BRISANJE RUTE / ZONE
+---------------------
+Otvorite panel detalja rute ili zone → kliknite "Obriši" → potvrdite.
+
+BRISANJE KOMENTARA
+------------------
+Možete brisati samo svoje komentare.
+Admin može brisati sve komentare.
+Kliknite "Obriši" pored komentara.
+
+
+========================================================================
+20. ADMIN PANEL
+========================================================================
+
+Admin panel dostupan je samo korisnicima sa administratorskim pravima.
+
+PRISTUP ADMIN PANELU
+---------------------
+U zaglavlju aplikacije kliknite na link "Admin" (vidljiv samo adminu).
+Ili direktno otvorite:
+  https://ognjenpetar.github.io/bio_rider_co-creation-map/admin
+
+SADRŽAJ ADMIN PANELA
+---------------------
+
+DUGME "RESETUJ CELU MAPU"
+--------------------------
+Nalazi se u gornjem desnom uglu admin panela — crveno dugme.
+
+PAŽNJA: Ova akcija je nepovratna!
+
+Kliknite → Otvara se dijаlog potvrde koji navodi šta će biti obrisano:
+  - Sve lokacije (i njihove fotografije i dokumenti)
+  - Sve nacrtane rute
+  - Sve nacrtane zone
+
+Kliknite "Da, obriši sve" za potvrdu, ili "Odustani" za otkazivanje.
+Po završetku prikazuje se zelena potvrda: "Mapa je uspešno resetovana".
+
+TAB "LOKACIJE"
+--------------
+Prikazuje tabelu svih aktivnih lokacija sa:
+  - Thumbnail fotografijom (ako postoji)
+  - Nazivom i kratkim opisom
+  - Kreatorom (korisničkim imenom)
+  - Koordinatama
+  - Datumom kreiranja
+  - Akcijama: Prikaži na mapi, Obriši
+
+Dugme "Prikaži na mapi" — navigira na mapu i centrira je na lokaciju.
+Dugme "Obriši" (ikona kante) — trajno briše lokaciju sa svim fajlovima.
+
+U zaglavlju taba prikazuje se ukupan broj lokacija.
+
+TAB "KORISNICI"
+---------------
+Prikazuje sve registrovane korisnike sa statistikama:
+  - Korisničko ime
+  - Broj lokacija, komentara, glasova
+  - Status (aktivan / banovan)
+
+AKCIJE NAD KORISNICIMA:
+  Banovanje korisnika:
+  - Kliknite "Banuj" pored korisnika.
+  - Izaberite trajanje bana:
+    * 5 minuta (test)
+    * 24 sata
+    * Trajno (permanent)
+    * Prilagođeno (unesite datum i vreme)
+  - Opciono unesite razlog bana.
+  - Kliknite "Potvrdi ban".
+
+  Odbanovanje korisnika:
+  - Kliknite "Odbani" pored banovanog korisnika.
+
+  Brisanje svih unosa korisnika:
+  - Kliknite "Obriši sve unose" — briše sve lokacije, komentare
+    i glasove tog korisnika.
+  - PAŽNJA: nepovratna akcija.
+
+NAPOMENE
+--------
+Banovani korisnik ne može da se prijavi ni da dodaje sadržaj.
+Sadržaj banovanog korisnika ostaje vidljiv (osim ako se posebno obriše).
+
+
+========================================================================
+21. ČESTA PITANJA I REŠAVANJE PROBLEMA
+========================================================================
+
+P: Zašto ne vidim dugme "Dodaj lokaciju"?
+O: Dugme je uvek vidljivo u toolbar-u. Ako je greška u korisniku,
+   pokušajte da se prijavite — za dodavanje lokacije potrebna je prijava.
+
+P: Kliknuo sam "Dodaj lokaciju" ali ne mogu da kliknem na mapu.
+O: Proverite da nije aktivan mod crtanja rute ili zone.
+   Kliknite "Otkaži" na eventualnom baneru sa uputstvom, pa pokušajte ponovo.
+
+P: Lokacija se nije sačuvala.
+O: Proverite da li ste uneli naziv (obavezno polje).
+   Proverite internet vezu. Pokušajte ponovo.
+
+P: Ne vidim rute i zone na mapi.
+O: Proverite da li su slojevi uključeni:
+   Toolbar → "Slojevi" → ☑ Rute i ☑ Zone moraju biti označeni.
+
+P: Zašto ne mogu da ostavim komentar?
+O: Prijava je obavezna za komentarisanje.
+   Proverite da li ste izabrali ocenu (1–5 zvezda) — ocena je obavezna.
+
+P: Mapa ne prikazuje novu lokaciju koju sam upravo dodao.
+O: Lokacija bi trebalo da se pojavi odmah. Ako ne, osvežite stranicu (F5).
+
+P: Mogu li da koristim platformu na mobilnom telefonu?
+O: Da — platforma je responzivna i radi na svim modernim mobilnim
+   pretraživačima (Chrome, Safari, Firefox na iOS i Android).
+
+P: Kako da promenim korisničko ime?
+O: Odjava i prijava sa novim imenom. Napomena: novi sadržaj biće
+   vezan za novo ime, a stari ostaje pod starim imenom.
+
+P: Mogu li da exportujem samo deo podataka?
+O: Trenutno se eksportuju svi podaci. Filtriranje pri eksportu
+   nije dostupno u ovoj verziji.
+
+P: Heatmapa se ne prikazuje iako ima lokacija.
+O: Kliknite dugme "Heatmapa" u toolbar-u — trebalo bi da postane
+   narandžasto. Ako ste je isključili kroz meni Slojevi, ponovo
+   je uključite tamo.
+
+P: Satelitski snimak se ne učitava.
+O: Satelitski snimak zavisi od eksternog servisa. Proverite internet
+   vezu. Pokušajte ponovo za nekoliko sekundi.
+
+P: Gde mogu da prijavim grešku ili predložim unapređenje?
+O: Obratite se administratoru platforme ili timu projekta BioRider.
+
+
+========================================================================
+  BioRider Ko-kreacijska Mapa | Korisničko uputstvo v1.0
+  Green Mobility | EIT Co-funded | RRA Zlatibor | IAUS
+========================================================================

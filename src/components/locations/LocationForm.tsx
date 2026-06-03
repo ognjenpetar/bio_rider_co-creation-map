@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useDropzone } from 'react-dropzone';
 import MDEditor from '@uiw/react-md-editor';
 import { useMap } from '../../contexts/MapContext';
+import { LOCATION_CATEGORIES, getCategoryDef } from '../../lib/locationCategories';
 import type { Location, LocationFormData } from '../../types';
 
 interface LocationFormProps {
@@ -46,10 +47,17 @@ export function LocationForm({
   const [longitude, setLongitude] = useState(
     pendingCoordinates?.lng ?? initialData?.longitude ?? 0
   );
+  const [category, setCategory] = useState(initialData?.category || 'other');
+  const [color, setColor] = useState(initialData?.color || getCategoryDef(initialData?.category || 'other').defaultColor);
   const [images, setImages] = useState<File[]>([]);
   const [documents, setDocuments] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const handleCategoryChange = (catId: string) => {
+    setCategory(catId);
+    setColor(getCategoryDef(catId).defaultColor);
+  };
 
   // Update coordinates when pendingCoordinates changes
   if (
@@ -128,6 +136,9 @@ export function LocationForm({
           description_en: descriptionEn.trim() || undefined,
           latitude,
           longitude,
+          category,
+          icon: getCategoryDef(category).emoji,
+          color,
         },
         images.length > 0 ? images : undefined,
         documents.length > 0 ? documents : undefined
@@ -162,6 +173,53 @@ export function LocationForm({
           className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
           required
         />
+      </div>
+
+      {/* Category selector */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Kategorija</label>
+        <div className="grid grid-cols-4 gap-1.5">
+          {LOCATION_CATEGORIES.map(cat => (
+            <button
+              key={cat.id}
+              type="button"
+              onClick={() => handleCategoryChange(cat.id)}
+              className={`flex flex-col items-center gap-1 px-2 py-2 rounded-xl border text-xs font-medium transition-all ${
+                category === cat.id
+                  ? 'border-2 shadow-sm scale-[1.03]'
+                  : 'border-gray-200 bg-white hover:bg-gray-50 text-gray-600'
+              }`}
+              style={category === cat.id ? { borderColor: color, backgroundColor: color + '18', color } : {}}
+              title={cat.label}
+            >
+              <span className="text-lg leading-none">{cat.emoji}</span>
+              <span className="leading-tight text-center" style={{ fontSize: '10px' }}>{cat.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Color picker */}
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Boja markera</label>
+        <div className="flex items-center gap-2 flex-wrap">
+          {['#22c55e','#3b82f6','#ef4444','#f59e0b','#8b5cf6','#ec4899','#0ea5e9','#10b981','#f97316','#dc2626','#16a34a','#6b7280'].map(c => (
+            <button
+              key={c}
+              type="button"
+              onClick={() => setColor(c)}
+              className={`w-7 h-7 rounded-full border-2 transition-transform ${color === c ? 'border-gray-800 scale-125' : 'border-white shadow'}`}
+              style={{ backgroundColor: c }}
+            />
+          ))}
+          <input
+            type="color"
+            value={color}
+            onChange={e => setColor(e.target.value)}
+            className="w-7 h-7 rounded-full border border-gray-300 cursor-pointer p-0.5"
+            title="Prilagođena boja"
+          />
+        </div>
       </div>
 
       {/* Description with language tabs */}

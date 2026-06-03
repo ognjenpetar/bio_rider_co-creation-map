@@ -1,0 +1,303 @@
+========================================================================
+BIO RIDER KO-KREACIJSKA MAPA
+Alat za participativno i ko-kreativno prostorno mapiranje
+========================================================================
+
+
+O ALATU
+------------------------------------------------------------------------
+Bio Rider Ko-kreacijska Mapa je digitalna platforma otvorena za sve
+građane i aktere u zajednici koji žele aktivno da učestvuju u
+oblikovanju mobilnosti i javnog prostora u svom gradu.
+
+Alat je nastao u okviru projekta koji podržavaju Green Mobility i
+EIT (European Institute of Innovation and Technology), sa ciljem da
+participacija ne bude deklarativna, već konkretna, vidljiva i merljiva.
+
+Nije potrebna instalacija. Otvara se u pretraživaču, radi na svim
+uređajima — računar, tablet, telefon.
+
+
+------------------------------------------------------------------------
+ARHITEKTURA I IZRADA (kratak tehnički osvrt)
+------------------------------------------------------------------------
+Platforma je izgrađena na modernom open-source stogu:
+
+  - Interaktivna mapa: Leaflet.js (OpenStreetMap podloga ili
+    satelitski snimak po izboru korisnika)
+  - Frontend aplikacija: React + TypeScript, animacije Framer Motion
+  - Baza podataka i storage: Supabase (PostgreSQL), sa podrškom
+    za upload fotografija i dokumenata
+  - Višejezičnost: srpski i engleski jezik (prebacivanje u realnom
+    vremenu)
+  - Bez obavezne registracije: korisnik bira korisničko ime i odmah
+    može da doprinosi sadržaju
+
+Svi podaci su trajno sačuvani u oblaku i dostupni svim korisnicima
+u realnom vremenu.
+
+
+========================================================================
+FUNKCIONALNOSTI — DETALJAN PREGLED
+========================================================================
+
+
+1. DODAVANJE LOKACIJA NA MAPU
+------------------------------------------------------------------------
+Svaki korisnik može jednim klikom na mapu da postavi marker (pin)
+i unese:
+  - Naziv lokacije
+  - Opis na srpskom i engleskom jeziku
+  - Fotografije (galerija, vidljiva svim korisnicima)
+  - Prateće dokumente (PDF, Word)
+
+Lokacije su odmah vidljive svim ostalim korisnicima bez moderacije,
+što reflektuje poverenje u zajednicu i podstiče otvorenu participaciju.
+
+Svaki marker prikazuje ko je lokaciju kreirao i kada — transparentnost
+je ugrađena u sistem.
+
+
+2. CRTANJE RUTA
+------------------------------------------------------------------------
+Korisnici mogu crtati biciklističke, pešačke, planiarske i biotop
+rute direktno na mapi:
+  - Postavljanje tački rute klikovima
+  - Automatski izračun dužine (km) i procenjenog vremena
+  - Izbor tipa rute (biciklistička, pešačka, planinska, biotop, ostalo)
+  - Prilagodljiva boja linije rute
+  - Mogućnost dodavanja fotografija i dokumenata uz rutu
+
+Rute su vidljive kao sloj na mapi koji se može uključiti/isključiti.
+Ovo je posebno korisno za mapiranje postojeće i željene infrastrukture.
+
+
+3. CRTANJE ZONA (POLIGONI)
+------------------------------------------------------------------------
+Korisnici mogu da iscrtaju poligone i označe zone od interesa:
+  - Park, biciklistička zona, restriktivna zona, rezidencijalna,
+    komercijalna, biotop zona
+  - Prilagodljiva boja ivice i ispune
+  - Naziv, opis, fotografije i dokumenti
+
+Zone omogućavaju prostorno definisanje problema ili potencijala
+koji nisu tačkaste prirode — na primer: "ova cela četvrt nema
+biciklističku infrastrukturu" ili "ovaj park je prioritet za zaštitu".
+
+
+4. KOMENTARISANJE I OCENJIVANJE (1–5 ZVEZDA)
+------------------------------------------------------------------------
+Na svakoj lokaciji, ruti ili zoni, prijavljeni korisnici mogu:
+  - Ostaviti komentar (tekstualni)
+  - Dati ocenu od 1 do 5 zvezda
+  - Priložiti fotografiju uz komentar (za lokacije)
+
+Sistem automatski izračunava prosečnu ocenu i prikazuje je pored
+naziva lokacije. Na taj način zajednica direktno signalizira kvalitet,
+stanje ili relevantnost mapiranih sadržaja.
+
+Primer primene: Korisnik postavi marker za opasnu raskrsnicu.
+Ostali građani daju niske ocene i ostavljaju komentare sa opisom
+problema. Ovaj agregat postaje jasan, merljiv signal za donosioce
+odluka.
+
+
+5. GLASANJE (PALAC GORE / PALAC DOLE)
+------------------------------------------------------------------------
+Pored komentara, svaki entitet (lokacija, ruta, zona) može dobiti
+glas podrške ili neslaganja. Sistem prikazuje:
+  - Ukupan broj glasova za i protiv
+  - Neto rezultat (za minus protiv)
+  - Glas svakog korisnika je jedinstven (jedan korisnik = jedan glas)
+
+Glasanje je brz mehanizam za agregaciju stava zajednice bez potrebe
+za elaboriranim komentarom.
+
+
+6. DISKUSIJA / DELIBERACIJA
+------------------------------------------------------------------------
+Za lokacije je dostupan poseban panel za strukturisanu diskusiju.
+Za razliku od komentara (koji su kratki i subjektivni), deliberativni
+prostor poziva korisnike na argumentovan dijalog o konkretnoj temi
+vezanoj za datu lokaciju.
+
+Ovo je ključni alat za facilizaciju konsultativnih procesa i skupljanje
+kvalitativnih podataka o stavovima zajednice.
+
+
+7. HEATMAPA
+------------------------------------------------------------------------
+Sloj toplotne mape vizualizuje gustinu postavljenih lokacija na mapi.
+  - Automatski podešen radijus na osnovu rasporeda podataka
+  - Ručno podešavanje: radijus, zamućenje (blur), intenzitet
+  - Ljubičasti gradijent — vizuelno čitak i distinktivan
+
+Heatmapa odgovara na pitanje: "Gde su koncentrisane tačke
+interesa/problema?" i služi kao osnova za prioritizaciju intervencija.
+
+
+8. VREMENSKA MAŠINA (TIME MACHINE)
+------------------------------------------------------------------------
+Slider koji filtrira lokacije prema datumu nastanka omogućava
+praćenje razvoja mape tokom vremena:
+  - Korisnik pomera klizač i vidi samo lokacije postavljene
+    do određenog datuma
+  - Omogućava narativizaciju procesa — "kako je mapa rasla"
+
+Ovo je posebno korisno u evaluativnim prezentacijama i izveštajima
+o toku projekta.
+
+
+9. PRETRAGA
+------------------------------------------------------------------------
+Integrisana pretraga lokacija, ruta i zona po imenu i opisu.
+Rezultati su trenutni, bez potrebe za učitavanjem stranice.
+
+
+10. DELJENJE LINKOVA
+------------------------------------------------------------------------
+Svaka lokacija ima jedinstveni URL koji korisnik može podeliti.
+Otvaranje linka automatski centrira mapu na tu lokaciju i otvara
+njen detalj.
+
+Ovo omogućava kontekstualizovano deljenje — u emailu, na društvenim
+mrežama, u izveštaju.
+
+
+11. VERIFIKACIJA LOKACIJA
+------------------------------------------------------------------------
+Sistem verifikacijskih bedževa označava lokacije koje su prošle
+pregled ili verifikaciju od strane administratora ili zajednice.
+Verifikovane lokacije imaju veći kredibilitet u skupu podataka.
+
+
+12. EXPORT PODATAKA
+------------------------------------------------------------------------
+Svi prikupljeni podaci mogu se eksportovati u standardnim formatima:
+  - CSV — za analizu u Excelu ili Google Sheets
+  - GeoJSON — za uvoz u GIS alate (QGIS, ArcGIS, uMap...)
+  - PDF — za izveštaje i prezentacije
+
+Ovo zatvara krug: podaci nastaju participacijom zajednice i odmah
+su upotrebljivi u profesionalnim planskim procesima.
+
+
+13. VIŠEJEZIČNOST
+------------------------------------------------------------------------
+Platforma je dostupna na srpskom i engleskom jeziku.
+Opisi lokacija mogu se uneti na oba jezika, što je posebno relevantno
+za međunarodne projekte i migrante u zajednici.
+
+
+14. ADMINISTRACIJA I MODERACIJA
+------------------------------------------------------------------------
+Administratori platforme imaju pristup panelu sa:
+  - Pregledom svih korisnika i njihovog doprinosa
+  - Mogućnošću privremenog ili trajnog blokiranja korisnika
+  - Pregledom i moderacijom lokacija
+  - Statistikama (broj lokacija, korisnika, komentara, glasova)
+
+Platforma je dizajnirana sa balansiranjem otvorenosti i odgovornosti:
+participacija je slobodna, ali odgovornost za kvalitet sadržaja postoji.
+
+
+========================================================================
+BENEFITI KO-KREATIVNOG I PARTICIPATIVNOG MAPIRANJA
+========================================================================
+
+
+ZA ZAJEDNICU I GRAĐANE
+------------------------------------------------------------------------
+→ Glas koji ostavlja trag
+  Svaki komentar, ocena ili marker nije samo mišljenje — to je
+  podatak koji ostaje, koji je vidljiv i koji može biti citiran.
+
+→ Ravnopravno učešće
+  Nije potrebno posebno znanje, status ni pozicija. Jedan klik
+  je jednak za sve — stručnjaka i komšiju.
+
+→ Vidljivost svakodnevnog iskustva
+  Građani znaju gde su opasne raskrsnice, gde nedostaje osvetljenje,
+  koje zelene površine su ugrožene. Ova mapa daje prostor da to
+  iskustvo postane podatkovna osnova.
+
+→ Osećaj vlasništva i angažovanosti
+  Zajednica koja gradi mapu zajedno oseća da je plan njen.
+  Participacija povećava prihvaćenost budućih odluka.
+
+
+ZA PLANERE, ISTRAŽIVAČE I DONOSIOCE ODLUKA
+------------------------------------------------------------------------
+→ Kvalitativni i kvantitativni podaci istovremeno
+  Lokacija na mapi + ocena + komentar + fotografija = bogat skup
+  podataka koji kombinuje prostorne, numeričke i narativne informacije.
+
+→ Prioritizacija temeljena na podacima
+  Lokacija sa 40 markera, prosečnom ocenom 1.8 i 60 glasova "protiv"
+  je jasno prioritetna za intervenciju — bez potrebe za dugim
+  anketnim procesima.
+
+→ GIS-kompatibilan output
+  GeoJSON export direktno ulazi u profesionalne GIS alate.
+  Participativni podaci postaju deo tehničke dokumentacije.
+
+→ Dokumentovanje procesa
+  Vremenska mašina i heatmapa dokumentuju razvoj participacije —
+  korisno za izveštavanje prema finansijerima i javnosti.
+
+→ Smanjenje troškova konsultacija
+  Digitalna participacija dostiže više glasova uz manji logistički
+  napor od fizičkih radionica.
+
+
+ZA PROJEKTE I ORGANIZACIJE
+------------------------------------------------------------------------
+→ Brzo postavljanje
+  Platforma je odmah operativna — nema instalacije, nema IT
+  zahteva za korisnike.
+
+→ Fleksibilnost primene
+  Alat je primenljiv na različite tematike: urbana mobilnost,
+  zelena infrastruktura, sigurnost u saobraćaju, kulturno nasleđe,
+  planiranje javnog prostora...
+
+→ Kontinuirana participacija
+  Za razliku od jednokratne radionice, digitalna mapa ostaje otvorena.
+  Zajednica može doprinositi tokom celog trajanja projekta.
+
+→ Transparentnost prema finansijerima
+  Broj korisnika, broj unosa, izvezeni podaci — sve je merljivo
+  i dokumentovano.
+
+
+========================================================================
+PRIMERI MOGUĆIH PRIMENA
+========================================================================
+
+  • Mapiranje biciklističke infrastrukture i kritičnih tačaka
+  • Identifikacija prioriteta za urbano ozelenjavanje
+  • Ko-kreacija pešačkih i ciklo-ruta sa građanima
+  • Dokumentovanje biotopa i zelenih koridora
+  • Participativna procena bezbednosti u saobraćaju
+  • Predlozi za nova parkirna mesta za bicikle
+  • Mapiranje barijera za osobe sa invaliditetom
+  • Planiranje novih zona smirenog saobraćaja
+  • Konsultacije za reviziju urbanističkih planova
+
+
+========================================================================
+NAPOMENA O PODACIMA I PRISTUPU
+========================================================================
+
+Podaci koje zajednica unese su javni i dostupni svima.
+Platforma ne zahteva lične podatke — korisnik bira samo korisničko ime.
+Administratori mogu moderisati sadržaj i upravljati korisnicima
+u slučaju zloupotrebe.
+
+Svi uneseni podaci mogu se eksportovati i koristiti van platforme,
+bez zaključavanja u vlasnički format.
+
+
+========================================================================
+  Bio Rider Ko-kreacijska Mapa | Green Mobility | EIT Co-funded
+========================================================================

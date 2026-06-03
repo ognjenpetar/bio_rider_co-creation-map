@@ -24,6 +24,7 @@ import { getBasicStats, type BasicStats } from '../lib/api/stats';
 import { EntityDetailModal, type SelectedEntity } from '../components/map/EntityDetailModal';
 import { ImportModal } from '../components/map/ImportModal';
 import { calcAutoRadius, type HeatmapOptions } from '../components/map/HeatmapLayer';
+import { LOCATION_CATEGORIES } from '../lib/locationCategories';
 import type { Location, LocationFormData, Coordinates, ZoneType } from '../types';
 
 // Haversine formula for route distance calculation
@@ -71,7 +72,9 @@ export function MapPage() {
   const [showRoutes, setShowRoutes] = useState(true);
   const [showZones, setShowZones] = useState(true);
   const [showTimeMachine, setShowTimeMachine] = useState(false);
-  const [filteredLocations, setFilteredLocations] = useState<Location[] | null>(null);
+  const [timeMachineLocations, setTimeMachineLocations] = useState<Location[] | null>(null);
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
+  const [showCategoryFilter, setShowCategoryFilter] = useState(false);
   const [showLayersMenu, setShowLayersMenu] = useState(false);
 
   // Route creation state (managed here, outside Leaflet context)
@@ -79,7 +82,7 @@ export function MapPage() {
   const [routeWaypoints, setRouteWaypoints] = useState<Coordinates[]>([]);
   const [showRouteSaveForm, setShowRouteSaveForm] = useState(false);
   const [routeName, setRouteName] = useState('');
-  const [routeType, setRouteType] = useState<'cycling' | 'walking' | 'hiking' | 'biotop' | 'other'>('cycling');
+  const [routeTypes, setRouteTypes] = useState<string[]>(['cycling']);
   const [routeSaving, setRouteSaving] = useState(false);
 
   // Zone creation state
@@ -212,17 +215,20 @@ export function MapPage() {
     setRouteSaving(true);
     try {
       const dist = calcDistance(routeWaypoints);
-      const speedKmH = routeType === 'cycling' ? 15 : 5;
+      const primaryType = (routeTypes[0] || 'other') as 'cycling' | 'walking' | 'hiking' | 'biotop' | 'other';
+      const speedKmH = primaryType === 'cycling' ? 15 : 5;
       await createRoute({
         name: routeName.trim(),
         waypoints: routeWaypoints,
         created_by: user.username,
-        route_type: routeType,
+        route_type: primaryType,
+        route_types: routeTypes,
         distance_km: Math.round(dist * 100) / 100,
         estimated_time_min: Math.round((dist / speedKmH) * 60),
       });
       handleCancelRoute();
       setRouteName('');
+      setRouteTypes(['cycling']);
       setShowRoutes(true);
       setRouteRefresh(prev => prev + 1);
     } catch (err) {
@@ -272,7 +278,10 @@ export function MapPage() {
   };
 
   const routeDistance = calcDistance(routeWaypoints);
-  const displayedLocations = filteredLocations || mapLocations;
+  const baseLocations = timeMachineLocations ?? mapLocations;
+  const displayedLocations = selectedCategories.size > 0
+    ? baseLocations.filter(l => selectedCategories.has(l.category || 'other'))
+    : baseLocations;
   const isDrawing = isCreatingRoute || isCreatingZone;
 
   return (
@@ -579,6 +588,81 @@ export function MapPage() {
               <span className="hidden sm:inline">{baseMap === 'osm' ? t('map.satellite') : t('map.osm')}</span>
             </button>
 
+            {/* Category filter */}
+            <div className="relative">
+              <button
+                onClick={() => setShowCategoryFilter(f => !f)}
+                className={`flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  selectedCategories.size > 0
+                    ? 'bg-green-100 text-green-700 ring-2 ring-green-400'
+                    : 'bg-gray-100 text-gray-700 hover:bg-green-50 hover:text-green-700'
+                }`}
+                title="Filter po kategorijama"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
+                </svg>
+                <span className="hidden sm:inline">Filter</span>
+                {selectedCategories.size > 0 && (
+                  <span className="bg-green-600 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center font-bold">{selectedCategories.size}</span>
+                )}
+              </button>
+
+              <AnimatePresence>
+                {showCategoryFilter && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    className="absolute left-0 mt-1 bg-white rounded-xl shadow-xl border border-gray-200 z-50 p-3 w-72"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-xs font-semibold text-gray-700">Filter po kategoriji</span>
+                      {selectedCategories.size > 0 && (
+                        <button
+                          onClick={() => setSelectedCategories(new Set())}
+                          className="text-xs text-red-500 hover:text-red-700"
+                        >
+                          Poništi sve
+                        </button>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-3 gap-1">
+                      {LOCATION_CATEGORIES.map(cat => {
+                        const active = selectedCategories.has(cat.id);
+                        return (
+                          <button
+                            key={cat.id}
+                            onClick={() => {
+                              setSelectedCategories(prev => {
+                                const next = new Set(prev);
+                                if (next.has(cat.id)) next.delete(cat.id);
+                                else next.add(cat.id);
+                                return next;
+                              });
+                            }}
+                            className={`flex flex-col items-center gap-0.5 px-1 py-2 rounded-lg border text-center transition-all ${
+                              active
+                                ? 'border-green-500 bg-green-50 text-green-700'
+                                : 'border-gray-200 hover:bg-gray-50 text-gray-600'
+                            }`}
+                          >
+                            <span className="text-base leading-none">{cat.emoji}</span>
+                            <span className="text-[10px] leading-tight">{cat.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {selectedCategories.size > 0 && (
+                      <p className="text-xs text-gray-400 mt-2 text-center">
+                        Prikazano: {displayedLocations.length} / {mapLocations.length} lokacija
+                      </p>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
             {/* ─── Time Machine (dedicated button) ─── */}
             <button
               onClick={() => setShowTimeMachine(prev => !prev)}
@@ -842,8 +926,8 @@ export function MapPage() {
             <TimeMachineSlider
               locations={mapLocations}
               visible={showTimeMachine}
-              onFilteredLocationsChange={setFilteredLocations}
-              onClose={() => { setShowTimeMachine(false); setFilteredLocations(null); }}
+              onFilteredLocationsChange={setTimeMachineLocations}
+              onClose={() => { setShowTimeMachine(false); setTimeMachineLocations(null); }}
             />
           </div>
 
@@ -963,17 +1047,40 @@ export function MapPage() {
                 autoFocus
               />
 
-              <select
-                value={routeType}
-                onChange={e => setRouteType(e.target.value as typeof routeType)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="cycling">🚲 {t('routes.cycling')}</option>
-                <option value="walking">🚶 {t('routes.walking')}</option>
-                <option value="hiking">🥾 {t('routes.hiking')}</option>
-                <option value="biotop">🌿 {t('routes.biotop')}</option>
-                <option value="other">📍 {t('routes.other')}</option>
-              </select>
+              <p className="text-xs font-medium text-gray-600 mb-1.5">Tip rute (može više):</p>
+              <div className="grid grid-cols-3 gap-1.5 mb-4">
+                {LOCATION_CATEGORIES && (() => {
+                  const RTYPES = [
+                    { id: 'cycling', label: 'Biciklistička', emoji: '🚲' },
+                    { id: 'walking', label: 'Pešačka', emoji: '🚶' },
+                    { id: 'hiking', label: 'Planinska', emoji: '🥾' },
+                    { id: 'biotop', label: 'Biotop', emoji: '🌿' },
+                    { id: 'other', label: 'Ostalo', emoji: '📍' },
+                  ];
+                  return RTYPES.map(rt => {
+                    const active = routeTypes.includes(rt.id);
+                    return (
+                      <button
+                        key={rt.id}
+                        type="button"
+                        onClick={() => setRouteTypes(prev =>
+                          prev.includes(rt.id)
+                            ? prev.length > 1 ? prev.filter(x => x !== rt.id) : prev
+                            : [...prev, rt.id]
+                        )}
+                        className={`flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg border text-xs font-medium transition-all ${
+                          active
+                            ? 'border-blue-500 bg-blue-50 text-blue-700'
+                            : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                        }`}
+                      >
+                        <span className="text-base leading-none">{rt.emoji}</span>
+                        <span className="leading-tight text-center" style={{ fontSize: '10px' }}>{rt.label}</span>
+                      </button>
+                    );
+                  });
+                })()}
+              </div>
 
               <div className="flex gap-2">
                 <button
