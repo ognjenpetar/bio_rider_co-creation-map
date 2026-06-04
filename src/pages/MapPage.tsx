@@ -614,7 +614,7 @@ export function MapPage() {
                     initial={{ opacity: 0, y: -5 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -5 }}
-                    className="absolute left-0 mt-1 bg-white rounded-xl shadow-xl border border-gray-200 z-50 p-3 w-72"
+                    className="absolute left-0 mt-1 bg-white rounded-xl shadow-xl border border-gray-200 z-50 p-3 w-80"
                   >
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-xs font-semibold text-gray-700">Filter po kategoriji</span>
@@ -627,7 +627,7 @@ export function MapPage() {
                         </button>
                       )}
                     </div>
-                    <div className="grid grid-cols-3 gap-1">
+                    <div className="grid grid-cols-4 gap-1 max-h-52 overflow-y-auto pr-0.5">
                       {LOCATION_CATEGORIES.map(cat => {
                         const active = selectedCategories.has(cat.id);
                         return (

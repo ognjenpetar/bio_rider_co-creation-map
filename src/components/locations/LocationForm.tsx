@@ -178,7 +178,7 @@ export function LocationForm({
       {/* Category selector */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Kategorija</label>
-        <div className="grid grid-cols-4 gap-1.5">
+        <div className="grid grid-cols-4 gap-1.5 max-h-52 overflow-y-auto pr-0.5">
           {LOCATION_CATEGORIES.map(cat => (
             <button
               key={cat.id}

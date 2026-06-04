@@ -23,6 +23,7 @@ import { getZoneImages, getZoneDocuments, uploadZoneImages, uploadZoneDocuments,
 import { StarRating } from './StarRating';
 import { CommentSkeletonList } from './SkeletonLoader';
 import { DeliberationPanel } from './DeliberationPanel';
+import { LOCATION_CATEGORIES, getCategoryDef } from '../../lib/locationCategories';
 import type { Location, Route, Zone, LocationImage, LocationDocument } from '../../types';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -246,6 +247,8 @@ export function EntityDetailModal({ entity, onClose, onDeleted, onUpdated }: Ent
   const [editDesc, setEditDesc] = useState('');
   const [editDescEn, setEditDescEn] = useState('');
   const [editDescSr, setEditDescSr] = useState('');
+  const [editCategory, setEditCategory] = useState('other');
+  const [editLocColor, setEditLocColor] = useState('#6b7280');
   const [editRouteType, setEditRouteType] = useState<'cycling' | 'walking' | 'hiking' | 'biotop' | 'other'>('cycling');
   const [editZoneType, setEditZoneType] = useState<'park' | 'cycling' | 'restricted' | 'residential' | 'commercial' | 'biotop' | 'other'>('other');
   const [editColor, setEditColor] = useState('#22c55e');
@@ -418,6 +421,8 @@ export function EntityDetailModal({ entity, onClose, onDeleted, onUpdated }: Ent
     if (entityType === 'location') {
       setEditDescEn(entity.data.description_en || '');
       setEditDescSr(entity.data.description_sr || '');
+      setEditCategory(entity.data.category || 'other');
+      setEditLocColor(entity.data.color || getCategoryDef(entity.data.category || 'other').defaultColor);
     }
     if (entityType === 'route') {
       setEditRouteType(entity.data.route_type);
@@ -443,6 +448,9 @@ export function EntityDetailModal({ entity, onClose, onDeleted, onUpdated }: Ent
           description: editDesc || undefined,
           description_en: editDescEn || undefined,
           description_sr: editDescSr || undefined,
+          category: editCategory,
+          icon: getCategoryDef(editCategory).emoji,
+          color: editLocColor,
         });
         if (newImages.length > 0) {
           const firstPath = await uploadLocationImages(entityId, newImages);
@@ -665,6 +673,58 @@ export function EntityDetailModal({ entity, onClose, onDeleted, onUpdated }: Ent
                           <label className="block text-xs font-medium text-gray-600 mb-1">Opis (EN)</label>
                           <textarea value={editDescEn} onChange={e => setEditDescEn(e.target.value)} rows={2}
                             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 outline-none resize-none" />
+                        </div>
+
+                        {/* Category selector */}
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-2">Kategorija</label>
+                          <div className="grid grid-cols-4 gap-1 max-h-48 overflow-y-auto pr-0.5">
+                            {LOCATION_CATEGORIES.map(cat => (
+                              <button
+                                key={cat.id}
+                                type="button"
+                                onClick={() => {
+                                  setEditCategory(cat.id);
+                                  setEditLocColor(getCategoryDef(cat.id).defaultColor);
+                                }}
+                                className={`flex flex-col items-center gap-0.5 px-1 py-2 rounded-xl border text-center transition-all ${
+                                  editCategory === cat.id
+                                    ? 'border-2 shadow-sm scale-[1.03]'
+                                    : 'border-gray-200 bg-white hover:bg-gray-50 text-gray-600'
+                                }`}
+                                style={editCategory === cat.id
+                                  ? { borderColor: editLocColor, backgroundColor: editLocColor + '18', color: editLocColor }
+                                  : {}}
+                                title={cat.label}
+                              >
+                                <span className="text-base leading-none">{cat.emoji}</span>
+                                <span className="leading-tight text-center" style={{ fontSize: '9px' }}>{cat.label}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Color picker */}
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-2">Boja markera</label>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            {['#22c55e','#3b82f6','#ef4444','#f59e0b','#8b5cf6','#ec4899','#0ea5e9','#10b981','#f97316','#dc2626','#16a34a','#6b7280'].map(c => (
+                              <button
+                                key={c}
+                                type="button"
+                                onClick={() => setEditLocColor(c)}
+                                className={`w-6 h-6 rounded-full border-2 transition-transform ${editLocColor === c ? 'border-gray-800 scale-125' : 'border-white shadow'}`}
+                                style={{ backgroundColor: c }}
+                              />
+                            ))}
+                            <input
+                              type="color"
+                              value={editLocColor}
+                              onChange={e => setEditLocColor(e.target.value)}
+                              className="w-6 h-6 rounded-full border border-gray-300 cursor-pointer p-0.5"
+                              title="Prilagođena boja"
+                            />
+                          </div>
                         </div>
                       </>
                     ) : (
