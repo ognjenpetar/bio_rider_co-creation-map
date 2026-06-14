@@ -10,6 +10,11 @@ export const LOCATION_CATEGORIES = [
   { id: 'bike_repair',        label: 'Servis bicikla',         labelEn: 'Bike Repair',           emoji: '🔧', defaultColor: '#b45309' },
   { id: 'parking',            label: 'Parking za bicikle',     labelEn: 'Bike Parking',          emoji: '🅿️', defaultColor: '#6366f1' },
   { id: 'bus_stop',           label: 'Autobusko stajalište',   labelEn: 'Bus Stop',              emoji: '🚌', defaultColor: '#f97316' },
+  { id: 'camping',            label: 'Kamp',                   labelEn: 'Camping',               emoji: '🏕️', defaultColor: '#a3e635' },
+  { id: 'fast_food',          label: 'Brza hrana',             labelEn: 'Fast Food',             emoji: '🍔', defaultColor: '#fb923c' },
+  { id: 'sports_field',       label: 'Sportski teren',         labelEn: 'Sports Field',          emoji: '⚽', defaultColor: '#4ade80' },
+  { id: 'phone_charger',      label: 'Punjač za telefone',     labelEn: 'Phone Charger',         emoji: '🔋', defaultColor: '#facc15' },
+  { id: 'wifi',               label: 'WiFi zona',              labelEn: 'WiFi Zone',             emoji: '📶', defaultColor: '#60a5fa' },
 
   // ── Priroda i ekologija ──
   { id: 'green_area',         label: 'Zelena površina',        labelEn: 'Green Area',            emoji: '🌳', defaultColor: '#16a34a' },
@@ -26,6 +31,11 @@ export const LOCATION_CATEGORIES = [
   { id: 'playground',         label: 'Dečije igralište',       labelEn: 'Playground',            emoji: '🛝', defaultColor: '#ec4899' },
   { id: 'cafe',               label: 'Kafić / restoran',       labelEn: 'Café / Restaurant',     emoji: '☕', defaultColor: '#a16207' },
   { id: 'shop',               label: 'Prodavnica',             labelEn: 'Shop',                  emoji: '🛒', defaultColor: '#f59e0b' },
+
+  // ── Ekologija i akcije ──
+  { id: 'cleaning_action',    label: 'Akcija čišćenja',        labelEn: 'Cleaning Action',       emoji: '🧹', defaultColor: '#34d399' },
+  { id: 'illegal_dump',       label: 'Divlja deponija',        labelEn: 'Illegal Dump',          emoji: '🗑️', defaultColor: '#78716c' },
+  { id: 'recycling',          label: 'Reciklažno mesto',       labelEn: 'Recycling Point',       emoji: '♻️', defaultColor: '#059669' },
 
   // ── Upozorenja i info ──
   { id: 'info_board',         label: 'Info tabla',             labelEn: 'Info Board',            emoji: 'ℹ️', defaultColor: '#0ea5e9' },

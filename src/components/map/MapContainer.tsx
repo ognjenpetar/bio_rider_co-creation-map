@@ -69,16 +69,18 @@ function MapClickHandler() {
 
 export type BaseMap = 'osm' | 'satellite';
 
-const TILE_LAYERS: Record<BaseMap, { url: string; attribution: string; maxZoom: number }> = {
+const TILE_LAYERS: Record<BaseMap, { url: string; attribution: string; maxZoom: number; maxNativeZoom: number }> = {
   osm: {
     url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    maxZoom: 19,
+    maxZoom: 21,
+    maxNativeZoom: 19,
   },
   satellite: {
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
     attribution: '&copy; Esri &mdash; Source: Esri, DigitalGlobe, USGS',
-    maxZoom: 18,
+    maxZoom: 21,
+    maxNativeZoom: 18,
   },
 };
 
@@ -106,6 +108,7 @@ export function MapContainer({ className = '', children, onLocationOpenDetail, b
       <LeafletMapContainer
         center={DEFAULT_CENTER}
         zoom={DEFAULT_ZOOM}
+        maxZoom={21}
         scrollWheelZoom={true}
         className={`w-full h-full ${isAddingLocation ? 'cursor-crosshair' : ''}`}
         style={{ minHeight: '400px' }}
@@ -118,6 +121,7 @@ export function MapContainer({ className = '', children, onLocationOpenDetail, b
           attribution={tileLayer.attribution}
           url={tileLayer.url}
           maxZoom={tileLayer.maxZoom}
+          maxNativeZoom={tileLayer.maxNativeZoom}
         />
 
         <LocationMarkers onOpenDetail={onLocationOpenDetail} />
