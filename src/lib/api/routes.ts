@@ -20,7 +20,7 @@ export async function getRoutes(): Promise<Route[]> {
     const route_types: string[] = Array.isArray(anyR.route_types)
       ? anyR.route_types
       : [r.route_type || 'other'];
-    return { ...r, waypoints, route_types } as unknown as Route;
+    return { ...r, waypoints, route_types, category: anyR.category || 'other', icon: anyR.icon || '📍' } as unknown as Route;
   });
 }
 
@@ -34,6 +34,8 @@ export async function createRoute(data: {
   route_types?: string[];
   distance_km?: number;
   estimated_time_min?: number;
+  category?: string;
+  icon?: string;
 }): Promise<Route> {
   const types = data.route_types && data.route_types.length > 0 ? data.route_types : [data.route_type || 'cycling'];
   const { data: route, error } = await supabase
@@ -45,8 +47,11 @@ export async function createRoute(data: {
       color: data.color || '#22c55e',
       created_by: data.created_by,
       route_type: types[0] as 'cycling' | 'walking' | 'hiking' | 'biotop' | 'other',
+      route_types: types,
       distance_km: data.distance_km || null,
       estimated_time_min: data.estimated_time_min || null,
+      category: data.category || 'other',
+      icon: data.icon || '📍',
     } as any)
     .select()
     .single();
@@ -56,6 +61,8 @@ export async function createRoute(data: {
     ...route,
     waypoints: data.waypoints,
     route_types: types,
+    category: data.category || 'other',
+    icon: data.icon || '📍',
   } as unknown as Route;
 }
 
@@ -67,6 +74,8 @@ export async function updateRoute(id: string, data: {
   color?: string;
   distance_km?: number | null;
   estimated_time_min?: number | null;
+  category?: string;
+  icon?: string;
 }): Promise<Route> {
   const { data: route, error } = await supabase
     .from('routes')
@@ -79,7 +88,7 @@ export async function updateRoute(id: string, data: {
   const anyR = route as any;
   const raw = anyR.waypoints;
   const waypoints = Array.isArray(raw) ? raw : typeof raw === 'string' ? JSON.parse(raw) : [];
-  return { ...route, waypoints, route_types: anyR.route_types || [anyR.route_type || 'other'] } as unknown as Route;
+  return { ...route, waypoints, route_types: anyR.route_types || [anyR.route_type || 'other'], category: anyR.category || 'other', icon: anyR.icon || '📍' } as unknown as Route;
 }
 
 export async function deleteRoute(id: string): Promise<void> {

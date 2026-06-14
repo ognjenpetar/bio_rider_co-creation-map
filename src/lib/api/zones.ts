@@ -10,13 +10,14 @@ export async function getZones(): Promise<Zone[]> {
 
   if (error) throw error;
   return (data || []).map(z => {
+    const anyZ = z as any;
     const raw = z.vertices;
     const vertices: Array<{ lat: number; lng: number }> = Array.isArray(raw)
       ? raw
       : typeof raw === 'string'
         ? JSON.parse(raw)
         : [];
-    return { ...z, vertices };
+    return { ...z, vertices, category: anyZ.category || 'other', icon: anyZ.icon || '📍' } as unknown as Zone;
   });
 }
 
@@ -28,6 +29,8 @@ export async function createZone(data: {
   fill_color?: string;
   created_by: string;
   zone_type?: ZoneType;
+  category?: string;
+  icon?: string;
 }): Promise<Zone> {
   const { data: zone, error } = await supabase
     .from('zones')
@@ -39,7 +42,9 @@ export async function createZone(data: {
       fill_color: data.fill_color || '#a5b4fc',
       created_by: data.created_by,
       zone_type: data.zone_type || 'other',
-    })
+      category: data.category || 'other',
+      icon: data.icon || '📍',
+    } as any)
     .select()
     .single();
 
@@ -47,7 +52,9 @@ export async function createZone(data: {
   return {
     ...zone,
     vertices: data.vertices,
-  };
+    category: data.category || 'other',
+    icon: data.icon || '📍',
+  } as unknown as Zone;
 }
 
 export async function updateZone(id: string, data: {
@@ -56,18 +63,21 @@ export async function updateZone(id: string, data: {
   zone_type?: ZoneType;
   color?: string;
   fill_color?: string;
+  category?: string;
+  icon?: string;
 }): Promise<Zone> {
   const { data: zone, error } = await supabase
     .from('zones')
-    .update(data)
+    .update(data as any)
     .eq('id', id)
     .select()
     .single();
 
   if (error) throw error;
+  const anyZ = zone as any;
   const raw = zone.vertices;
   const vertices = Array.isArray(raw) ? raw : typeof raw === 'string' ? JSON.parse(raw) : [];
-  return { ...zone, vertices };
+  return { ...zone, vertices, category: anyZ.category || 'other', icon: anyZ.icon || '📍' } as unknown as Zone;
 }
 
 export async function deleteZone(id: string): Promise<void> {

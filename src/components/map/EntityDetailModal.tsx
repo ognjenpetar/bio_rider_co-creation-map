@@ -250,7 +250,9 @@ export function EntityDetailModal({ entity, onClose, onDeleted, onUpdated }: Ent
   const [editCategory, setEditCategory] = useState('other');
   const [editLocColor, setEditLocColor] = useState('#6b7280');
   const [editRouteType, setEditRouteType] = useState<'cycling' | 'walking' | 'hiking' | 'biotop' | 'other'>('cycling');
+  const [editRouteCategory, setEditRouteCategory] = useState('other');
   const [editZoneType, setEditZoneType] = useState<'park' | 'cycling' | 'restricted' | 'residential' | 'commercial' | 'biotop' | 'other'>('other');
+  const [editZoneCategory, setEditZoneCategory] = useState('other');
   const [editColor, setEditColor] = useState('#22c55e');
   const [editFillColor, setEditFillColor] = useState('#a5b4fc');
   const [editDistKm, setEditDistKm] = useState('');
@@ -426,12 +428,14 @@ export function EntityDetailModal({ entity, onClose, onDeleted, onUpdated }: Ent
     }
     if (entityType === 'route') {
       setEditRouteType(entity.data.route_type);
+      setEditRouteCategory((entity.data as any).category || 'other');
       setEditColor(entity.data.color);
       setEditDistKm(entity.data.distance_km?.toString() || '');
       setEditTimeMin(entity.data.estimated_time_min?.toString() || '');
     }
     if (entityType === 'zone') {
       setEditZoneType(entity.data.zone_type);
+      setEditZoneCategory((entity.data as any).category || 'other');
       setEditColor(entity.data.color);
       setEditFillColor(entity.data.fill_color);
     }
@@ -470,6 +474,8 @@ export function EntityDetailModal({ entity, onClose, onDeleted, onUpdated }: Ent
           color: editColor,
           distance_km: editDistKm ? parseFloat(editDistKm) : null,
           estimated_time_min: editTimeMin ? parseInt(editTimeMin) : null,
+          category: editRouteCategory,
+          icon: getCategoryDef(editRouteCategory).emoji,
         });
         if (newImages.length > 0) await uploadRouteImages(entityId, newImages);
         if (newDocuments.length > 0) await uploadRouteDocuments(entityId, newDocuments);
@@ -482,6 +488,8 @@ export function EntityDetailModal({ entity, onClose, onDeleted, onUpdated }: Ent
           zone_type: editZoneType,
           color: editColor,
           fill_color: editFillColor,
+          category: editZoneCategory,
+          icon: getCategoryDef(editZoneCategory).emoji,
         });
         if (newImages.length > 0) await uploadZoneImages(entityId, newImages);
         if (newDocuments.length > 0) await uploadZoneDocuments(entityId, newDocuments);
@@ -739,46 +747,66 @@ export function EntityDetailModal({ entity, onClose, onDeleted, onUpdated }: Ent
                       <>
                         <div>
                           <label className="block text-xs font-medium text-gray-600 mb-1">Tip rute</label>
-                          <select
-                            value={editRouteType}
-                            onChange={e => setEditRouteType(e.target.value as typeof editRouteType)}
-                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 outline-none"
-                          >
-                            <option value="cycling">🚲 Cycling</option>
-                            <option value="walking">🚶 Walking</option>
-                            <option value="hiking">🥾 Hiking</option>
-                            <option value="biotop">🌿 Biotop</option>
-                            <option value="other">📍 Other</option>
-                          </select>
+                          <div className="grid grid-cols-5 gap-1">
+                            {[
+                              { id: 'cycling', label: 'Biciklist.', emoji: '🚲' },
+                              { id: 'walking', label: 'Pešačka', emoji: '🚶' },
+                              { id: 'hiking', label: 'Planinska', emoji: '🥾' },
+                              { id: 'biotop', label: 'Biotop', emoji: '🌿' },
+                              { id: 'other', label: 'Ostalo', emoji: '📍' },
+                            ].map(rt => (
+                              <button key={rt.id} type="button"
+                                onClick={() => setEditRouteType(rt.id as typeof editRouteType)}
+                                className={`flex flex-col items-center gap-0.5 py-1.5 px-1 rounded-lg border text-center transition-all ${
+                                  editRouteType === rt.id ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 hover:bg-gray-50 text-gray-600'
+                                }`}>
+                                <span className="text-sm">{rt.emoji}</span>
+                                <span style={{ fontSize: '9px' }}>{rt.label}</span>
+                              </button>
+                            ))}
+                          </div>
                         </div>
+
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">Ikonica / kategorija</label>
+                          <div className="grid grid-cols-5 gap-1 max-h-32 overflow-y-auto pr-0.5">
+                            {LOCATION_CATEGORIES.map(cat => (
+                              <button key={cat.id} type="button"
+                                onClick={() => { setEditRouteCategory(cat.id); setEditColor(getCategoryDef(cat.id).defaultColor); }}
+                                className={`flex flex-col items-center gap-0.5 py-1.5 px-1 rounded-lg border text-center transition-all ${
+                                  editRouteCategory === cat.id ? 'border-2 shadow-sm' : 'border-gray-200 hover:bg-gray-50 text-gray-600'
+                                }`}
+                                style={editRouteCategory === cat.id ? { borderColor: editColor, backgroundColor: editColor + '18', color: editColor } : {}}
+                                title={cat.label}>
+                                <span className="text-sm leading-none">{cat.emoji}</span>
+                                <span className="leading-tight" style={{ fontSize: '8px' }}>{cat.label}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
                         <div className="grid grid-cols-2 gap-3">
                           <div>
                             <label className="block text-xs font-medium text-gray-600 mb-1">Dužina (km)</label>
-                            <input
-                              type="number"
-                              value={editDistKm}
-                              onChange={e => setEditDistKm(e.target.value)}
-                              min="0"
-                              step="0.1"
-                              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 outline-none"
-                            />
+                            <input type="number" value={editDistKm} onChange={e => setEditDistKm(e.target.value)} min="0" step="0.1"
+                              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 outline-none" />
                           </div>
                           <div>
                             <label className="block text-xs font-medium text-gray-600 mb-1">Vreme (min)</label>
-                            <input
-                              type="number"
-                              value={editTimeMin}
-                              onChange={e => setEditTimeMin(e.target.value)}
-                              min="0"
-                              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 outline-none"
-                            />
+                            <input type="number" value={editTimeMin} onChange={e => setEditTimeMin(e.target.value)} min="0"
+                              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 outline-none" />
                           </div>
                         </div>
                         <div>
                           <label className="block text-xs font-medium text-gray-600 mb-1">Boja linije</label>
-                          <div className="flex items-center gap-2">
-                            <input type="color" value={editColor} onChange={e => setEditColor(e.target.value)} className="w-10 h-9 rounded-lg border border-gray-300 cursor-pointer" />
-                            <span className="text-sm text-gray-500">{editColor}</span>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            {['#22c55e','#3b82f6','#ef4444','#f59e0b','#8b5cf6','#ec4899','#0ea5e9','#10b981','#f97316','#6b7280'].map(c => (
+                              <button key={c} type="button" onClick={() => setEditColor(c)}
+                                className={`w-6 h-6 rounded-full border-2 transition-transform ${editColor === c ? 'border-gray-800 scale-125' : 'border-white shadow'}`}
+                                style={{ backgroundColor: c }} />
+                            ))}
+                            <input type="color" value={editColor} onChange={e => setEditColor(e.target.value)}
+                              className="w-6 h-6 rounded-full border border-gray-300 cursor-pointer p-0.5" />
                           </div>
                         </div>
                       </>
@@ -787,34 +815,45 @@ export function EntityDetailModal({ entity, onClose, onDeleted, onUpdated }: Ent
                     {entityType === 'zone' && (
                       <>
                         <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1">Tip zone</label>
-                          <select
-                            value={editZoneType}
-                            onChange={e => setEditZoneType(e.target.value as typeof editZoneType)}
-                            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 outline-none"
-                          >
-                            <option value="park">🌳 Park</option>
-                            <option value="cycling">🚲 Cycling Zone</option>
-                            <option value="restricted">⚠️ Restricted</option>
-                            <option value="residential">🏠 Residential</option>
-                            <option value="commercial">🏪 Commercial</option>
-                            <option value="biotop">🌿 Biotop</option>
-                            <option value="other">📍 Other</option>
-                          </select>
+                          <label className="block text-xs font-medium text-gray-600 mb-1">Ikonica / kategorija</label>
+                          <div className="grid grid-cols-5 gap-1 max-h-32 overflow-y-auto pr-0.5">
+                            {LOCATION_CATEGORIES.map(cat => (
+                              <button key={cat.id} type="button"
+                                onClick={() => { setEditZoneCategory(cat.id); setEditColor(getCategoryDef(cat.id).defaultColor); setEditFillColor(getCategoryDef(cat.id).defaultColor + '33'); }}
+                                className={`flex flex-col items-center gap-0.5 py-1.5 px-1 rounded-lg border text-center transition-all ${
+                                  editZoneCategory === cat.id ? 'border-2 shadow-sm' : 'border-gray-200 hover:bg-gray-50 text-gray-600'
+                                }`}
+                                style={editZoneCategory === cat.id ? { borderColor: editColor, backgroundColor: editColor + '18', color: editColor } : {}}
+                                title={cat.label}>
+                                <span className="text-sm leading-none">{cat.emoji}</span>
+                                <span className="leading-tight" style={{ fontSize: '8px' }}>{cat.label}</span>
+                              </button>
+                            ))}
+                          </div>
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                           <div>
                             <label className="block text-xs font-medium text-gray-600 mb-1">Boja ivice</label>
-                            <div className="flex items-center gap-2">
-                              <input type="color" value={editColor} onChange={e => setEditColor(e.target.value)} className="w-10 h-9 rounded-lg border border-gray-300 cursor-pointer" />
-                              <span className="text-xs text-gray-500">{editColor}</span>
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              {['#6366f1','#3b82f6','#22c55e','#ef4444','#f59e0b','#8b5cf6'].map(c => (
+                                <button key={c} type="button" onClick={() => setEditColor(c)}
+                                  className={`w-5 h-5 rounded-full border-2 transition-transform ${editColor === c ? 'border-gray-800 scale-125' : 'border-white shadow'}`}
+                                  style={{ backgroundColor: c }} />
+                              ))}
+                              <input type="color" value={editColor} onChange={e => setEditColor(e.target.value)}
+                                className="w-5 h-5 rounded-full border border-gray-300 cursor-pointer p-0.5" />
                             </div>
                           </div>
                           <div>
                             <label className="block text-xs font-medium text-gray-600 mb-1">Boja ispune</label>
-                            <div className="flex items-center gap-2">
-                              <input type="color" value={editFillColor} onChange={e => setEditFillColor(e.target.value)} className="w-10 h-9 rounded-lg border border-gray-300 cursor-pointer" />
-                              <span className="text-xs text-gray-500">{editFillColor}</span>
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              {['#a5b4fc','#93c5fd','#86efac','#fca5a5','#fcd34d','#c4b5fd'].map(c => (
+                                <button key={c} type="button" onClick={() => setEditFillColor(c)}
+                                  className={`w-5 h-5 rounded-full border-2 transition-transform ${editFillColor === c ? 'border-gray-800 scale-125' : 'border-white shadow'}`}
+                                  style={{ backgroundColor: c }} />
+                              ))}
+                              <input type="color" value={editFillColor} onChange={e => setEditFillColor(e.target.value)}
+                                className="w-5 h-5 rounded-full border border-gray-300 cursor-pointer p-0.5" />
                             </div>
                           </div>
                         </div>

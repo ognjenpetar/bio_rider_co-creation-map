@@ -139,6 +139,8 @@ export interface Route {
   estimated_time_min: number | null;
   route_type: 'cycling' | 'walking' | 'hiking' | 'biotop' | 'other';
   route_types: string[];
+  category: string | null;
+  icon: string | null;
   is_active: boolean;
   votes_up: number;
   votes_down: number;
@@ -194,6 +196,8 @@ export interface Zone {
   fill_color: string;
   created_by: string;
   zone_type: ZoneType;
+  category: string | null;
+  icon: string | null;
   is_active: boolean;
   votes_up: number;
   votes_down: number;

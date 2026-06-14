@@ -24,7 +24,7 @@ import { getBasicStats, type BasicStats } from '../lib/api/stats';
 import { EntityDetailModal, type SelectedEntity } from '../components/map/EntityDetailModal';
 import { ImportModal } from '../components/map/ImportModal';
 import { calcAutoRadius, type HeatmapOptions } from '../components/map/HeatmapLayer';
-import { LOCATION_CATEGORIES } from '../lib/locationCategories';
+import { LOCATION_CATEGORIES, getCategoryDef } from '../lib/locationCategories';
 import type { Location, LocationFormData, Coordinates, ZoneType } from '../types';
 
 // Haversine formula for route distance calculation
@@ -83,6 +83,8 @@ export function MapPage() {
   const [showRouteSaveForm, setShowRouteSaveForm] = useState(false);
   const [routeName, setRouteName] = useState('');
   const [routeTypes, setRouteTypes] = useState<string[]>(['cycling']);
+  const [routeCategory, setRouteCategory] = useState('other');
+  const [routeColor, setRouteColor] = useState('#22c55e');
   const [routeSaving, setRouteSaving] = useState(false);
 
   // Zone creation state
@@ -91,6 +93,9 @@ export function MapPage() {
   const [showZoneSaveForm, setShowZoneSaveForm] = useState(false);
   const [zoneName, setZoneName] = useState('');
   const [zoneType, setZoneType] = useState<ZoneType>('other');
+  const [zoneCategory, setZoneCategory] = useState('other');
+  const [zoneColor, setZoneColor] = useState('#6366f1');
+  const [zoneFillColor, setZoneFillColor] = useState('#a5b4fc');
   const [zoneSaving, setZoneSaving] = useState(false);
   const [zoneRefresh, setZoneRefresh] = useState(0);
   const [routeRefresh, setRouteRefresh] = useState(0);
@@ -225,10 +230,15 @@ export function MapPage() {
         route_types: routeTypes,
         distance_km: Math.round(dist * 100) / 100,
         estimated_time_min: Math.round((dist / speedKmH) * 60),
+        category: routeCategory,
+        icon: getCategoryDef(routeCategory).emoji,
+        color: routeColor,
       });
       handleCancelRoute();
       setRouteName('');
       setRouteTypes(['cycling']);
+      setRouteCategory('other');
+      setRouteColor('#22c55e');
       setShowRoutes(true);
       setRouteRefresh(prev => prev + 1);
     } catch (err) {
@@ -263,10 +273,17 @@ export function MapPage() {
         vertices: zoneVertices,
         created_by: user.username,
         zone_type: zoneType,
+        category: zoneCategory,
+        icon: getCategoryDef(zoneCategory).emoji,
+        color: zoneColor,
+        fill_color: zoneFillColor,
       });
       handleCancelZone();
       setZoneName('');
       setZoneType('other');
+      setZoneCategory('other');
+      setZoneColor('#6366f1');
+      setZoneFillColor('#a5b4fc');
       setShowZones(true);
       setZoneRefresh(prev => prev + 1);
     } catch (err) {
@@ -1048,38 +1065,65 @@ export function MapPage() {
               />
 
               <p className="text-xs font-medium text-gray-600 mb-1.5">Tip rute (može više):</p>
-              <div className="grid grid-cols-3 gap-1.5 mb-4">
-                {LOCATION_CATEGORIES && (() => {
-                  const RTYPES = [
-                    { id: 'cycling', label: 'Biciklistička', emoji: '🚲' },
-                    { id: 'walking', label: 'Pešačka', emoji: '🚶' },
-                    { id: 'hiking', label: 'Planinska', emoji: '🥾' },
-                    { id: 'biotop', label: 'Biotop', emoji: '🌿' },
-                    { id: 'other', label: 'Ostalo', emoji: '📍' },
-                  ];
-                  return RTYPES.map(rt => {
-                    const active = routeTypes.includes(rt.id);
-                    return (
-                      <button
-                        key={rt.id}
-                        type="button"
-                        onClick={() => setRouteTypes(prev =>
-                          prev.includes(rt.id)
-                            ? prev.length > 1 ? prev.filter(x => x !== rt.id) : prev
-                            : [...prev, rt.id]
-                        )}
-                        className={`flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg border text-xs font-medium transition-all ${
-                          active
-                            ? 'border-blue-500 bg-blue-50 text-blue-700'
-                            : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                        }`}
-                      >
-                        <span className="text-base leading-none">{rt.emoji}</span>
-                        <span className="leading-tight text-center" style={{ fontSize: '10px' }}>{rt.label}</span>
-                      </button>
-                    );
-                  });
-                })()}
+              <div className="grid grid-cols-3 gap-1.5 mb-3">
+                {[
+                  { id: 'cycling', label: 'Biciklistička', emoji: '🚲' },
+                  { id: 'walking', label: 'Pešačka', emoji: '🚶' },
+                  { id: 'hiking', label: 'Planinska', emoji: '🥾' },
+                  { id: 'biotop', label: 'Biotop', emoji: '🌿' },
+                  { id: 'other', label: 'Ostalo', emoji: '📍' },
+                ].map(rt => {
+                  const active = routeTypes.includes(rt.id);
+                  return (
+                    <button
+                      key={rt.id}
+                      type="button"
+                      onClick={() => setRouteTypes(prev =>
+                        prev.includes(rt.id)
+                          ? prev.length > 1 ? prev.filter(x => x !== rt.id) : prev
+                          : [...prev, rt.id]
+                      )}
+                      className={`flex flex-col items-center gap-0.5 py-2 px-1 rounded-lg border text-xs font-medium transition-all ${
+                        active ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      <span className="text-base leading-none">{rt.emoji}</span>
+                      <span className="leading-tight text-center" style={{ fontSize: '10px' }}>{rt.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <p className="text-xs font-medium text-gray-600 mb-1.5">Ikonica / kategorija:</p>
+              <div className="grid grid-cols-5 gap-1 max-h-36 overflow-y-auto mb-3 pr-0.5">
+                {LOCATION_CATEGORIES.map(cat => (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => { setRouteCategory(cat.id); setRouteColor(cat.defaultColor); }}
+                    className={`flex flex-col items-center gap-0.5 py-1.5 px-1 rounded-lg border text-center transition-all ${
+                      routeCategory === cat.id
+                        ? 'border-2 shadow-sm'
+                        : 'border-gray-200 hover:bg-gray-50 text-gray-600'
+                    }`}
+                    style={routeCategory === cat.id ? { borderColor: routeColor, backgroundColor: routeColor + '18', color: routeColor } : {}}
+                    title={cat.label}
+                  >
+                    <span className="text-sm leading-none">{cat.emoji}</span>
+                    <span className="leading-tight" style={{ fontSize: '8px' }}>{cat.label}</span>
+                  </button>
+                ))}
+              </div>
+
+              <p className="text-xs font-medium text-gray-600 mb-1.5">Boja linije:</p>
+              <div className="flex items-center gap-1.5 flex-wrap mb-4">
+                {['#22c55e','#3b82f6','#ef4444','#f59e0b','#8b5cf6','#ec4899','#0ea5e9','#10b981','#f97316','#6b7280'].map(c => (
+                  <button key={c} type="button" onClick={() => setRouteColor(c)}
+                    className={`w-6 h-6 rounded-full border-2 transition-transform ${routeColor === c ? 'border-gray-800 scale-125' : 'border-white shadow'}`}
+                    style={{ backgroundColor: c }} />
+                ))}
+                <input type="color" value={routeColor} onChange={e => setRouteColor(e.target.value)}
+                  className="w-6 h-6 rounded-full border border-gray-300 cursor-pointer p-0.5" />
               </div>
 
               <div className="flex gap-2">
@@ -1132,19 +1176,53 @@ export function MapPage() {
                 autoFocus
               />
 
-              <select
-                value={zoneType}
-                onChange={e => setZoneType(e.target.value as ZoneType)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              >
-                <option value="park">🌳 {t('zones.types.park')}</option>
-                <option value="cycling">🚲 {t('zones.types.cycling')}</option>
-                <option value="restricted">⚠️ {t('zones.types.restricted')}</option>
-                <option value="residential">🏠 {t('zones.types.residential')}</option>
-                <option value="commercial">🏪 {t('zones.types.commercial')}</option>
-                <option value="biotop">🌿 {t('zones.types.biotop')}</option>
-                <option value="other">📍 {t('zones.types.other')}</option>
-              </select>
+              <p className="text-xs font-medium text-gray-600 mb-1.5">Ikonica / kategorija:</p>
+              <div className="grid grid-cols-5 gap-1 max-h-36 overflow-y-auto mb-3 pr-0.5">
+                {LOCATION_CATEGORIES.map(cat => (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    onClick={() => { setZoneCategory(cat.id); setZoneColor(cat.defaultColor); setZoneFillColor(cat.defaultColor + '33'); }}
+                    className={`flex flex-col items-center gap-0.5 py-1.5 px-1 rounded-lg border text-center transition-all ${
+                      zoneCategory === cat.id
+                        ? 'border-2 shadow-sm'
+                        : 'border-gray-200 hover:bg-gray-50 text-gray-600'
+                    }`}
+                    style={zoneCategory === cat.id ? { borderColor: zoneColor, backgroundColor: zoneColor + '18', color: zoneColor } : {}}
+                    title={cat.label}
+                  >
+                    <span className="text-sm leading-none">{cat.emoji}</span>
+                    <span className="leading-tight" style={{ fontSize: '8px' }}>{cat.label}</span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                <div>
+                  <p className="text-xs font-medium text-gray-600 mb-1">Boja ivice:</p>
+                  <div className="flex items-center gap-1 flex-wrap">
+                    {['#6366f1','#3b82f6','#22c55e','#ef4444','#f59e0b','#8b5cf6'].map(c => (
+                      <button key={c} type="button" onClick={() => setZoneColor(c)}
+                        className={`w-5 h-5 rounded-full border-2 transition-transform ${zoneColor === c ? 'border-gray-800 scale-125' : 'border-white shadow'}`}
+                        style={{ backgroundColor: c }} />
+                    ))}
+                    <input type="color" value={zoneColor} onChange={e => setZoneColor(e.target.value)}
+                      className="w-5 h-5 rounded-full border border-gray-300 cursor-pointer p-0.5" />
+                  </div>
+                </div>
+                <div>
+                  <p className="text-xs font-medium text-gray-600 mb-1">Boja ispune:</p>
+                  <div className="flex items-center gap-1 flex-wrap">
+                    {['#a5b4fc','#93c5fd','#86efac','#fca5a5','#fcd34d','#c4b5fd'].map(c => (
+                      <button key={c} type="button" onClick={() => setZoneFillColor(c)}
+                        className={`w-5 h-5 rounded-full border-2 transition-transform ${zoneFillColor === c ? 'border-gray-800 scale-125' : 'border-white shadow'}`}
+                        style={{ backgroundColor: c }} />
+                    ))}
+                    <input type="color" value={zoneFillColor} onChange={e => setZoneFillColor(e.target.value)}
+                      className="w-5 h-5 rounded-full border border-gray-300 cursor-pointer p-0.5" />
+                  </div>
+                </div>
+              </div>
 
               <div className="flex gap-2">
                 <button
