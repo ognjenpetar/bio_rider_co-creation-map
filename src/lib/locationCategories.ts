@@ -21,6 +21,7 @@ export const LOCATION_CATEGORIES = [
   { id: 'biotop_significant', label: 'Značajan biotop',        labelEn: 'Significant Biotop',    emoji: '🦋', defaultColor: '#15803d' },
   { id: 'fishing',            label: 'Mesto za pecanje',       labelEn: 'Fishing Spot',          emoji: '🎣', defaultColor: '#0284c7' },
   { id: 'wildlife',           label: 'Divlje životinje',       labelEn: 'Wildlife',              emoji: '🦌', defaultColor: '#166534' },
+  { id: 'water_quality',      label: 'Merenje kvaliteta vode', labelEn: 'Water Quality Monitoring', emoji: '🧪', defaultColor: '#0891b2' },
 
   // ── Turizam i kultura ──
   { id: 'viewpoint',          label: 'Vidikovac',              labelEn: 'Viewpoint',             emoji: '🔭', defaultColor: '#7c3aed' },
