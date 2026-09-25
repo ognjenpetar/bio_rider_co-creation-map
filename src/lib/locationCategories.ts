@@ -16,6 +16,11 @@ export const LOCATION_CATEGORIES = [
   { id: 'phone_charger',      label: 'Punjač za telefone',     labelEn: 'Phone Charger',         emoji: '🔋', defaultColor: '#facc15' },
   { id: 'wifi',               label: 'WiFi zona',              labelEn: 'WiFi Zone',             emoji: '📶', defaultColor: '#60a5fa' },
 
+  // ── Pristupačnost (osobe sa invaliditetom) ──
+  { id: 'wheelchair_access',  label: 'Pristupačno kolicima',   labelEn: 'Wheelchair Accessible', emoji: '♿', defaultColor: '#2563eb' },
+  { id: 'blind_access',       label: 'Pristupačno slepima',    labelEn: 'Accessible for Blind',  emoji: '🦯', defaultColor: '#2563eb' },
+  { id: 'needs_accessibility', label: 'Potrebna pristupačnost (rampa)', labelEn: 'Needs Accessibility (Ramp)', emoji: '🚧♿', defaultColor: '#f59e0b' },
+
   // ── Priroda i ekologija ──
   { id: 'green_area',         label: 'Zelena površina',        labelEn: 'Green Area',            emoji: '🌳', defaultColor: '#16a34a' },
   { id: 'biotop_significant', label: 'Značajan biotop',        labelEn: 'Significant Biotop',    emoji: '🦋', defaultColor: '#15803d' },
