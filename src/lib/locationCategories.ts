@@ -20,6 +20,7 @@ export const LOCATION_CATEGORIES = [
   { id: 'wheelchair_access',  label: 'Pristupačno kolicima',   labelEn: 'Wheelchair Accessible', emoji: '♿', defaultColor: '#2563eb' },
   { id: 'blind_access',       label: 'Pristupačno slepima',    labelEn: 'Accessible for Blind',  emoji: '🦯', defaultColor: '#2563eb' },
   { id: 'needs_accessibility', label: 'Potrebna pristupačnost (rampa)', labelEn: 'Needs Accessibility (Ramp)', emoji: '🚧♿', defaultColor: '#f59e0b' },
+  { id: 'quiet_zone',         label: 'Mirna zona',             labelEn: 'Quiet Zone',            emoji: '🤫', defaultColor: '#a78bfa' },
 
   // ── Priroda i ekologija ──
   { id: 'green_area',         label: 'Zelena površina',        labelEn: 'Green Area',            emoji: '🌳', defaultColor: '#16a34a' },
